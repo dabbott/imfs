@@ -36,7 +36,14 @@ export function basename(filename: string, extname?: string) {
     filename = filename.slice(0, -extname.length)
   }
 
-  return filename.slice(filename.lastIndexOf(sep) + 1)
+  const sepIndex = filename.lastIndexOf(sep)
+
+  // If the seperator index is the last character, omit it
+  if (sepIndex === filename.length - 1) {
+    return filename.slice(0, -1)
+  }
+
+  return filename.slice(sepIndex + 1)
 }
 
 export function dirname(filename: string) {

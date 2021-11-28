@@ -17,7 +17,11 @@
   "repository": "https://github.com/dabbott/tree-visit",
   "license": "MIT",
   "dependencies": {
-    "immer": "^9.0.7"
+    "base64-arraybuffer": "^1.0.1",
+    "buffer": "^6.0.3",
+    "buffs": "^0.6.0",
+    "immer": "^9.0.7",
+    "tree-visit": "^0.1.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
