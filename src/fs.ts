@@ -13,97 +13,73 @@ export function toUint8Array(data: string | ArrayBufferView) {
   }
 }
 
-function fileNameToString(file: PathOrFileDescriptor): string {
-  if (typeof file !== 'string')
-    throw new Error('only string filepaths are supported')
+// function fileNameToString(file: PathOrFileDescriptor): string {
+//   if (typeof file !== 'string')
+//     throw new Error('only string filepaths are supported')
 
-  return file
-}
+//   return file
+// }
 
-type FunctionWithStorage<T extends (...args: any[]) => any> = (
-  storage: Storage.Directory,
-  ...rest: Parameters<T>
-) => ReturnType<T>
+// type FunctionWithStorage<T extends (...args: any[]) => any> = (
+//   storage: Storage.Directory,
+//   ...rest: Parameters<T>
+// ) => ReturnType<T>
 
-export const writeFileSync: FunctionWithStorage<IFS['writeFileSync']> =
-  function writeFileSync(storage, file, data) {
-    const bytes = toUint8Array(data)
-    const filename = fileNameToString(file)
-    Storage.writeFile(storage, filename, bytes)
-  }
+// export const writeFileSync: FunctionWithStorage<IFS['writeFileSync']> =
+//   function writeFileSync(storage, file, data) {
+//     const bytes = toUint8Array(data)
+//     const filename = fileNameToString(file)
+//     Storage.writeFile(storage, filename, bytes)
+//   }
 
-// export function readFileSync(
-//   path: PathOrFileDescriptor,
-//   options?: {
-//     encoding?: null | undefined
-//     flag?: string | undefined
-//   } | null
-// ): Buffer
+// export const readFileSync: FunctionWithStorage<IFS['readFileSync']> =
+//   function readFileSync(storage, path, options) {
+//     const filename = fileNameToString(path)
+//     const bytes = Storage.getFile(storage, filename)
 
-// export function readFileSync(
-//   path: PathOrFileDescriptor,
-//   options:
-//     | {
-//         encoding: BufferEncoding
-//         flag?: string | undefined
-//       }
-//     | BufferEncoding
-// ): string
+//     if (!bytes) throw new Error('File not found')
 
-export const readFileSync: FunctionWithStorage<IFS['readFileSync']> =
-  function readFileSync(storage, path, options) {
-    const filename = fileNameToString(path)
-    const bytes = Storage.getFile(storage, filename)
+//     return Buffer.from(bytes as any)
+//   }
 
-    if (!bytes) throw new Error('File not found')
+// export const lstatSync: FunctionWithStorage<IFS['lstatSync']> =
+//   function lstatSync(storage, path, options) {
+//     const filename = fileNameToString(path)
 
-    return Buffer.from(bytes as any)
-  }
+//     let file: Storage.Entry
 
-export const lstatSync: FunctionWithStorage<IFS['lstatSync']> =
-  function lstatSync(storage, path, options) {
-    const filename = fileNameToString(path)
+//     if (filename === '/') {
+//       file = storage
+//     } else {
+//       const entry = Storage.locate(storage, filename)
 
-    let file: Storage.Entry
+//       if (!entry) throw new Error(`File ${filename} not found`)
 
-    if (filename === '/') {
-      file = storage
-    } else {
-      const entry = Storage.locate(storage, filename)
+//       file = entry.parent[entry.name]
+//     }
 
-      if (!entry) throw new Error(`File ${filename} not found`)
+//     return {
+//       isDirectory() {
+//         return Storage.isDirectory(file)
+//       },
+//       isFile() {
+//         return Storage.isFile(file)
+//       },
+//     } as Stats
+//   }
 
-      file = entry.parent[entry.name]
-    }
-
-    return {
-      isDirectory() {
-        // console.log('is dir?', file)
-        return Storage.isDirectory(file)
-      },
-      isFile() {
-        return Storage.isFile(file)
-      },
-    } as Stats
-  }
-
-export const readdirSync: FunctionWithStorage<IFS['readdirSync']> =
-  function readdirSync(storage, path, options) {
-    // console.log('readdir sync', storage, path)
-    const filename = fileNameToString(path)
-    return Storage.readDirectory(storage, filename) as any
-  }
+// export const readdirSync: FunctionWithStorage<IFS['readdirSync']> =
+//   function readdirSync(storage, path, options) {
+//     const filename = fileNameToString(path)
+//     return Storage.readDirectory(storage, filename) as any
+//   }
 
 export function bind(root: Storage.Directory): Partial<IFS> {
-  // const readFileSync: IFS['readFileSync'] = (): Buffer | string => {
-  //   return 0 as any
-  // }
-
   return {
-    writeFileSync: writeFileSync.bind(null, root),
-    readFileSync: readFileSync.bind(null, root) as any,
-    lstatSync: lstatSync.bind(null, root) as any,
-    readdirSync: readdirSync.bind(null, root) as any,
-    chmodSync: () => {},
+    // writeFileSync: writeFileSync.bind(null, root),
+    // readFileSync: readFileSync.bind(null, root) as any,
+    // lstatSync: lstatSync.bind(null, root) as any,
+    // readdirSync: readdirSync.bind(null, root) as any,
+    // chmodSync: () => {},
   }
 }

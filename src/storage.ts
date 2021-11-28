@@ -8,12 +8,12 @@ export interface Directory {
   [key: string]: Entry
 }
 
-export function isDirectory(entry: Entry): entry is Directory {
-  return typeof entry === 'object'
-}
-
 export function isFile(entry: Entry): entry is File {
   return entry instanceof Uint8Array
+}
+
+export function isDirectory(entry: Entry): entry is Directory {
+  return !isFile(entry)
 }
 
 export function contains<T extends string>(
@@ -21,20 +21,6 @@ export function contains<T extends string>(
   name: T
 ): directory is Directory & { [key in T]: Entry } {
   return name in directory
-}
-
-export function hasFile<T extends string>(
-  directory: Directory,
-  name: T
-): directory is Directory & { [key in T]: Entry } {
-  return contains(directory, name) && isFile(directory[name])
-}
-
-export function hasDirectory<T extends string>(
-  directory: Directory,
-  name: T
-): directory is Directory & { [key in T]: Directory } {
-  return contains(directory, name) && isDirectory(directory[name])
 }
 
 export function locate(
@@ -54,9 +40,10 @@ export function locate(
 
   for (let i = 0; i < components.length - 1; i++) {
     const component = components[i]
+    const value = current[component]
 
-    if (hasDirectory(current, component)) {
-      current = current[component]
+    if (isDirectory(value)) {
+      current = value
       continue
     } else {
       const next: Directory = {}
@@ -75,28 +62,15 @@ export function exists(directory: Directory, filepath: string) {
   return !!locate(directory, filepath)
 }
 
-export function getDirectory(
-  directory: Directory,
-  filepath: string
-): Directory | undefined {
-  const target = locate(directory, filepath)
-
-  if (!target) return
-
-  if (!hasDirectory(target.parent, target.name)) return
-
-  return target.parent[target.name]
-}
-
-export function getFile(
+export function getEntry(
   directory: Directory,
   filepath: string
 ): Entry | undefined {
+  if (filepath === '.' || filepath === '/') return directory
+
   const target = locate(directory, filepath)
 
-  if (!target) return
-
-  if (!hasFile(target.parent, target.name)) return
+  if (!target || !(target.name in target.parent)) return
 
   return target.parent[target.name]
 }
@@ -111,15 +85,8 @@ export function makeDirectory(directory: Directory, filepath: string) {
   }
 }
 
-export function readDirectory(
-  directory: Directory,
-  filepath: string
-): string[] {
-  const target = getDirectory(directory, filepath)
-
-  if (!target) return []
-
-  return Object.keys(target)
+export function readDirectory(directory: Directory): string[] {
+  return Object.keys(directory)
 }
 
 export function writeFile(
@@ -144,8 +111,10 @@ export function getPaths(directory: Directory): string[] {
       .map((name) => join(path, name))
       .concat(
         ...names.map((name) => {
-          if (hasDirectory(directory, name)) {
-            return inner(join(path, name), directory[name])
+          const value = directory[name]
+
+          if (isDirectory(value)) {
+            return inner(join(path, name), value)
           } else {
             return []
           }
