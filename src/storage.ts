@@ -1,27 +1,6 @@
 import { join, sep } from './path'
-
-export type File = Uint8Array
-
-export type Entry = File | Directory
-
-export interface Directory {
-  [key: string]: Entry
-}
-
-export function isFile(entry: Entry): entry is File {
-  return entry instanceof Uint8Array
-}
-
-export function isDirectory(entry: Entry): entry is Directory {
-  return !isFile(entry)
-}
-
-export function contains<T extends string>(
-  directory: Directory,
-  name: T
-): directory is Directory & { [key in T]: Entry } {
-  return name in directory
-}
+import { Entries } from './storage/entries'
+import { Directory, Entry } from './storage/types'
 
 export function locate(
   directory: Directory,
@@ -40,15 +19,13 @@ export function locate(
 
   for (let i = 0; i < components.length - 1; i++) {
     const component = components[i]
-    const value = current[component]
+    const value = current.entries[component]
 
-    if (isDirectory(value)) {
+    if (Entries.isDirectory(value)) {
       current = value
       continue
     } else {
-      const next: Directory = {}
-      current[component] = next
-      current = next
+      throw new Error(`Directory ${component} doesn't exist!`)
     }
   }
 
@@ -58,73 +35,73 @@ export function locate(
   }
 }
 
-export function exists(directory: Directory, filepath: string) {
-  return !!locate(directory, filepath)
-}
+// export function exists(directory: Directory, filepath: string) {
+//   return !!locate(directory, filepath)
+// }
 
-export function getEntry(
-  directory: Directory,
-  filepath: string
-): Entry | undefined {
-  if (filepath === '.' || filepath === '/') return directory
+// export function getEntry(
+//   directory: Directory,
+//   filepath: string
+// ): Entry | undefined {
+//   if (filepath === '.' || filepath === '/') return directory
 
-  const target = locate(directory, filepath)
+//   const target = locate(directory, filepath)
 
-  if (!target || !(target.name in target.parent)) return
+//   if (!target || !(target.name in target.parent)) return
 
-  return target.parent[target.name]
-}
+//   return target.parent[target.name]
+// }
 
-export function makeDirectory(directory: Directory, filepath: string) {
-  const target = locate(directory, filepath)
+// export function makeDirectory(directory: Directory, filepath: string) {
+//   const target = locate(directory, filepath)
 
-  if (target) {
-    target.parent[target.name] = {}
-  } else {
-    throw new Error(`Failed to locate ${filepath}`)
-  }
-}
+//   if (target) {
+//     target.parent[target.name] = {}
+//   } else {
+//     throw new Error(`Failed to locate ${filepath}`)
+//   }
+// }
 
-export function readDirectory(directory: Directory): string[] {
-  return Object.keys(directory)
-}
+// export function readDirectory(directory: Directory): string[] {
+//   return Object.keys(directory)
+// }
 
-export function writeFile(
-  directory: Directory,
-  filepath: string,
-  data: Uint8Array
-) {
-  const target = locate(directory, filepath)
+// export function writeFile(
+//   directory: Directory,
+//   filepath: string,
+//   data: Uint8Array
+// ) {
+//   const target = locate(directory, filepath)
 
-  if (target) {
-    target.parent[target.name] = data
-  } else {
-    throw new Error(`Failed to locate ${filepath}`)
-  }
-}
+//   if (target) {
+//     target.parent[target.name] = data
+//   } else {
+//     throw new Error(`Failed to locate ${filepath}`)
+//   }
+// }
 
-export function getPaths(directory: Directory): string[] {
-  function inner(path: string, directory: Directory): string[] {
-    const names = Object.keys(directory)
+// export function getPaths(directory: Directory): string[] {
+//   function inner(path: string, directory: Directory): string[] {
+//     const names = Object.keys(directory)
 
-    return names
-      .map((name) => join(path, name))
-      .concat(
-        ...names.map((name) => {
-          const value = directory[name]
+//     return names
+//       .map((name) => join(path, name))
+//       .concat(
+//         ...names.map((name) => {
+//           const value = directory[name]
 
-          if (isDirectory(value)) {
-            return inner(join(path, name), value)
-          } else {
-            return []
-          }
-        })
-      )
-  }
+//           if (isDirectory(value)) {
+//             return inner(join(path, name), value)
+//           } else {
+//             return []
+//           }
+//         })
+//       )
+//   }
 
-  return inner('', directory)
-}
+//   return inner('', directory)
+// }
 
-export function create(): Directory {
-  return {}
-}
+// export function create(): Directory {
+//   return {}
+// }

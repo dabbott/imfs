@@ -1,7 +1,7 @@
 import { copy, createFs, IFS } from 'buffs'
 import path, { basename } from 'path'
 import { withOptions } from 'tree-visit'
-import { bind } from '../fs'
+// import { bind } from '../fs'
 import * as Storage from '../storage'
 
 function isDirectory(source: IFS, path: string) {

@@ -1,29 +1,51 @@
 export const sep = '/'
 
+function preserveLeadingAndTrailingSlash(original: string, updated: string) {
+  if (original.startsWith('/')) {
+    updated = '/' + updated
+  }
+
+  if (updated[updated.length - 1] !== '/' && original.endsWith('/')) {
+    updated = updated + '/'
+  }
+
+  return updated
+}
+
 export function normalize(filename: string) {
-  const segments = filename.split(sep)
+  const components = filename.split(sep).filter((component) => !!component)
 
   let i = 0
-  let length = segments.length - 1
+  let length = components.length - 1
 
   while (i < length) {
-    if (segments[i] === '.') {
-      segments.splice(i, 1)
+    if (components[i] === '.') {
+      components.splice(i, 1)
       length--
-    } else if (segments[i] === '..' && i !== 0) {
-      segments.splice(i - 1, 2)
+    } else if (components[i] === '..' && i !== 0) {
+      components.splice(i - 1, 2)
       length -= 2
       i -= 1
+    } else if (components[i] === '' && components[i + 1] === '') {
+      // Consecutive "/"
+      components.splice(i, 1)
+      length--
     } else {
       i++
     }
   }
 
-  return segments.join(sep)
+  return preserveLeadingAndTrailingSlash(filename, components.join(sep))
 }
 
-export function join(...parts: string[]) {
-  return normalize(parts.filter((part) => !!part).join(sep))
+export function join(...components: string[]) {
+  let result = normalize(components.join(sep))
+
+  if (result === '') {
+    result = '.'
+  }
+
+  return result
 }
 
 export function extname(filename: string) {
@@ -47,9 +69,16 @@ export function basename(filename: string, extname?: string) {
 }
 
 export function dirname(filename: string) {
-  if (filename === '') return '.'
-  if (filename === sep) return sep
-
   let base = basename(filename)
-  return filename.slice(0, -(base.length + 1))
+  let result = filename.slice(0, -(base.length + 1))
+
+  if (result === '') {
+    if (filename.startsWith(sep)) {
+      result = sep
+    } else {
+      result = '.'
+    }
+  }
+
+  return result
 }

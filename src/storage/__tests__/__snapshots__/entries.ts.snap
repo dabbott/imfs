@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`read directory 1`] = `
+"/ (directory)
+├── /a (file)
+└── /nested (directory)
+    └── /nested/b (file)"
+`;

@@ -20,21 +20,38 @@ test('basename', () => {
   expect(path.basename('bar/')).toEqual(nodePath.basename('bar/'))
 })
 
-// test('dirname', () => {
-//   expect(dirname('foo')).toEqual('')
-//   expect(dirname('bar/foo')).toEqual('bar')
-//   expect(dirname('bar/baz/foo')).toEqual('bar/baz')
+test('normalize', () => {
+  expect(path.normalize('foo')).toEqual(nodePath.normalize('foo'))
+  expect(path.normalize('foo/')).toEqual(nodePath.normalize('foo/'))
+  expect(path.normalize('/foo')).toEqual(nodePath.normalize('/foo'))
+  expect(path.normalize('/foo/')).toEqual(nodePath.normalize('/foo/'))
+  expect(path.normalize('/foo/bar')).toEqual(nodePath.normalize('/foo/bar'))
+  expect(path.normalize('/foo//bar')).toEqual(nodePath.normalize('/foo//bar'))
+  expect(path.normalize('//')).toEqual(nodePath.normalize('//'))
+  expect(path.normalize('/////')).toEqual(nodePath.normalize('/////'))
+})
 
-//   expect(dirname('')).toEqual('.')
-//   expect(dirname('/')).toEqual('/')
-//   expect(dirname('bar/')).toEqual('bar')
-// })
+test('dirname', () => {
+  expect(path.dirname('foo')).toEqual(nodePath.dirname('foo'))
+  expect(path.dirname('bar/foo')).toEqual(nodePath.dirname('bar/foo'))
+  expect(path.dirname('bar/baz/foo')).toEqual(nodePath.dirname('bar/baz/foo'))
+  expect(path.dirname('/foo')).toEqual(nodePath.dirname('/foo'))
 
-// test('join', () => {
-//   expect(join('foo')).toEqual('foo')
-//   expect(join('bar', 'foo')).toEqual('bar/foo')
-//   expect(join('bar', 'baz', 'foo')).toEqual('bar/baz/foo')
+  expect(path.dirname('')).toEqual(nodePath.dirname(''))
+  expect(path.dirname('/')).toEqual(nodePath.dirname('/'))
+  expect(path.dirname('bar/')).toEqual(nodePath.dirname('bar/'))
+})
 
-//   expect(join('')).toEqual('')
-//   expect(join('bar', '', 'foo')).toEqual('bar/foo')
-// })
+test('join', () => {
+  expect(path.join('foo')).toEqual(nodePath.join('foo'))
+  expect(path.join('bar', 'foo')).toEqual(nodePath.join('bar', 'foo'))
+  expect(path.join('bar', 'baz', 'foo')).toEqual(
+    nodePath.join('bar', 'baz', 'foo')
+  )
+  expect(path.join('/', 'bar')).toEqual(nodePath.join('/', 'bar'))
+
+  expect(path.join('')).toEqual(nodePath.join(''))
+  expect(path.join('/')).toEqual(nodePath.join('/'))
+  expect(path.join('/', '/')).toEqual(nodePath.join('/', '/'))
+  expect(path.join('bar', '', 'foo')).toEqual(nodePath.join('bar', '', 'foo'))
+})

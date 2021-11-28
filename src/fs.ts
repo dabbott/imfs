@@ -74,12 +74,12 @@ export function toUint8Array(data: string | ArrayBufferView) {
 //     return Storage.readDirectory(storage, filename) as any
 //   }
 
-export function bind(root: Storage.Directory): Partial<IFS> {
-  return {
-    // writeFileSync: writeFileSync.bind(null, root),
-    // readFileSync: readFileSync.bind(null, root) as any,
-    // lstatSync: lstatSync.bind(null, root) as any,
-    // readdirSync: readdirSync.bind(null, root) as any,
-    // chmodSync: () => {},
-  }
-}
+// export function bind(root: Storage.Directory): Partial<IFS> {
+//   return {
+//     // writeFileSync: writeFileSync.bind(null, root),
+//     // readFileSync: readFileSync.bind(null, root) as any,
+//     // lstatSync: lstatSync.bind(null, root) as any,
+//     // readdirSync: readdirSync.bind(null, root) as any,
+//     // chmodSync: () => {},
+//   }
+// }
