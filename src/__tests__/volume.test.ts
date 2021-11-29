@@ -1,6 +1,6 @@
 import { Node, Nodes, path, Volume } from '..'
 
-function diagram<T>(root: Node<T>) {
+function diagram<Data>(root: Node<Data>) {
   return Nodes.traversal().diagram(
     ['/', root],
     ([pathname, node]) =>

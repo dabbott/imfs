@@ -27,11 +27,11 @@ const getComponentsInternal = (pathlike: PathLike) => {
   return typeof pathlike === 'string' ? getPathComponents(pathlike) : pathlike
 }
 
-function getNode<T>(root: Node<T>, pathlike: PathLike): Node<T> {
+function getNode<Data>(root: Node<Data>, pathlike: PathLike): Node<Data> {
   const components = getComponentsInternal(pathlike)
 
   let i = 0
-  let current: Node<T> = root
+  let current: Node<Data> = root
 
   while (i < components.length) {
     let component = components[i]
@@ -56,10 +56,10 @@ function getNode<T>(root: Node<T>, pathlike: PathLike): Node<T> {
   return current
 }
 
-function setNode<T, U extends Node<T>>(
+function setNode<Data, U extends Node<Data>>(
   root: U,
   pathlike: PathLike,
-  node: Node<T>
+  node: Node<Data>
 ): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
@@ -70,11 +70,11 @@ function setNode<T, U extends Node<T>>(
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    parent.entries[newName] = node as Draft<Node<T>>
+    parent.entries[newName] = node as Draft<Node<Data>>
   })
 }
 
-function readFile<T>(root: Node<T>, pathlike: PathLike): T {
+function readFile<Data>(root: Node<Data>, pathlike: PathLike): Data {
   const components = getComponentsInternal(pathlike)
   const node = getNode(root, components)
 
@@ -85,7 +85,7 @@ function readFile<T>(root: Node<T>, pathlike: PathLike): T {
   return node.data
 }
 
-function readDirectory<T>(root: Node<T>, pathlike: PathLike): string[] {
+function readDirectory<Data>(root: Node<Data>, pathlike: PathLike): string[] {
   const components = getComponentsInternal(pathlike)
   const node = getNode(root, components)
 
@@ -108,7 +108,10 @@ function getNewAndParentName(pathlike: PathLike) {
   return { parentName, newName }
 }
 
-function makeDirectory<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
+function makeDirectory<Data, U extends Node<Data>>(
+  root: U,
+  pathlike: PathLike
+): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
@@ -129,15 +132,18 @@ function makeDirectory<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
   })
 }
 
-function writeFile<T, U extends Node<T>>(
+function writeFile<Data, U extends Node<Data>>(
   root: U,
   pathlike: PathLike,
-  data: T
+  data: Data
 ): U {
   return setNode(root, pathlike, Nodes.createFile(data))
 }
 
-function removeFile<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
+function removeFile<Data, U extends Node<Data>>(
+  root: U,
+  pathlike: PathLike
+): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {

@@ -2,45 +2,47 @@ import { Node, File, Directory } from './types'
 import { withOptions } from 'tree-visit'
 import { join } from './path'
 
-function createFile<T>(data: T): File<T> {
+function createFile<Data>(data: Data): File<Data> {
   return { type: 'file', data }
 }
 
-function createDirectory<T>(
-  entries: Directory<T>['entries'] = {}
-): Directory<T> {
+function createDirectory<Data>(
+  entries: Directory<Data>['entries'] = {}
+): Directory<Data> {
   return { type: 'directory', entries }
 }
 
-function isFile<T>(node: Node<T>): node is File<T> {
+function isFile<Data>(node: Node<Data>): node is File<Data> {
   return node.type === 'file'
 }
 
-function isDirectory<T>(node: Node<T>): node is Directory<T> {
+function isDirectory<Data>(node: Node<Data>): node is Directory<Data> {
   return node.type === 'directory'
 }
 
-function readDirectory<T>(directory: Directory<T>) {
+function readDirectory<Data>(directory: Directory<Data>) {
   return Object.keys(directory.entries)
 }
 
-function getNode<T>(
-  directory: Directory<T>,
+function getNode<Data>(
+  directory: Directory<Data>,
   name: string
-): Node<T> | undefined {
+): Node<Data> | undefined {
   return directory.entries[name]
 }
 
-function hasNode<T, K extends string>(
-  directory: Directory<T>,
-  name: K
-): directory is Directory<T> & { value: { [key in K]: Node<T> } } {
+function hasNode<Data, Key extends string>(
+  directory: Directory<Data>,
+  name: Key
+): directory is Directory<Data> & { value: { [key in Key]: Node<Data> } } {
   return name in directory.entries
 }
 
-export type NamedEntry<T> = [string, Node<T>]
+export type NamedEntry<Data> = [string, Node<Data>]
 
-function getNamedEntries<T>(namedEntry: NamedEntry<T>): NamedEntry<T>[] {
+function getNamedEntries<Data>(
+  namedEntry: NamedEntry<Data>
+): NamedEntry<Data>[] {
   const [pathname, node] = namedEntry
 
   return node.type === 'directory'
@@ -51,8 +53,8 @@ function getNamedEntries<T>(namedEntry: NamedEntry<T>): NamedEntry<T>[] {
     : []
 }
 
-function traversal<T>() {
-  return withOptions<[string, Node<T>]>({
+function traversal<Data>() {
+  return withOptions<[string, Node<Data>]>({
     getChildren: getNamedEntries,
   })
 }

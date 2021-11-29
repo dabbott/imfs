@@ -1,8 +1,8 @@
-export type File<T> = { type: 'file'; data: T }
+export type File<Data> = { type: 'file'; data: Data }
 
-export type Directory<T> = {
+export type Directory<Data> = {
   type: 'directory'
-  entries: Record<string, Node<T>>
+  entries: Record<string, Node<Data>>
 }
 
-export type Node<T> = File<T> | Directory<T>
+export type Node<Data> = File<Data> | Directory<Data>
