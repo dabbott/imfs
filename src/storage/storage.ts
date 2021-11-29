@@ -78,9 +78,20 @@ function readDirectory(root: Entry, pathlike: PathLike): string[] {
   return Entries.readDirectory(entry)
 }
 
-function makeDirectory<T extends Entry>(root: T, path: string): T {
-  const parentName = dirname(path)
-  const newName = basename(path)
+function getNewAndParentName(pathlike: PathLike) {
+  const parentName =
+    typeof pathlike === 'string' ? dirname(pathlike) : pathlike.slice(0, -1)
+
+  const newName =
+    typeof pathlike === 'string'
+      ? basename(pathlike)
+      : pathlike[pathlike.length - 1]
+
+  return { parentName, newName }
+}
+
+function makeDirectory<T extends Entry>(root: T, pathlike: PathLike): T {
+  const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
     const parent = getEntry(draft, parentName)
@@ -97,11 +108,10 @@ function makeDirectory<T extends Entry>(root: T, path: string): T {
 
 function writeFile<T extends Entry>(
   root: T,
-  path: string,
+  pathlike: PathLike,
   data: Uint8Array
 ): T {
-  const parentName = dirname(path)
-  const newName = basename(path)
+  const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
     const parent = getEntry(draft, parentName)
