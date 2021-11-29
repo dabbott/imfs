@@ -1,5 +1,4 @@
-import { Node, File, Directory, Entry } from './types'
-import { join } from './path'
+import { Directory, File, Node } from './types'
 
 function createFile<Data>(data: Data): File<Data> {
   return { type: 'file', data }

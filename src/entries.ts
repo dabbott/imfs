@@ -1,4 +1,4 @@
-import { Nodes } from '.'
+import { Nodes } from './node'
 import { join } from './path'
 import { Entry, Node } from './types'
 
