@@ -1,4 +1,4 @@
 export * from './types'
 export * from './node'
-export * from './storage'
+export * from './volume'
 export * as path from './path'

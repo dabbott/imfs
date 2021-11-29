@@ -1,5 +1,4 @@
-import { Nodes } from '../node'
-import { Directory } from '../types'
+import { Directory, Nodes } from '..'
 
 it('node tools', () => {
   const file = Nodes.createFile(Uint8Array.from([0, 1, 2, 3]))

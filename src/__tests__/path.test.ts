@@ -1,5 +1,5 @@
-import { path } from '../index'
 import nodePath from 'path'
+import { path } from '..'
 
 test('basename', () => {
   expect(path.basename('foo')).toEqual(nodePath.basename('foo'))

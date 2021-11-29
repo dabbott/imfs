@@ -153,7 +153,7 @@ function removeFile<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
   })
 }
 
-export const Storage = {
+export const Volume = {
   getPathComponents,
   getNode,
   setNode,
