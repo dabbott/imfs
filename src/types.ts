@@ -6,3 +6,5 @@ export type Directory<Data> = {
 }
 
 export type Node<Data> = File<Data> | Directory<Data>
+
+export type NamedEntry<Data> = [string, Node<Data>]

@@ -1,4 +1,4 @@
-import { Node, File, Directory } from './types'
+import { Node, File, Directory, NamedEntry } from './types'
 import { join } from './path'
 
 function createFile<Data>(data: Data): File<Data> {
@@ -36,8 +36,6 @@ function hasEntry<Data, Key extends string>(
 ): directory is Directory<Data> & { value: { [key in Key]: Node<Data> } } {
   return name in directory.entries
 }
-
-export type NamedEntry<Data> = [string, Node<Data>]
 
 function getNamedEntries<Data>(
   namedEntry: NamedEntry<Data>
