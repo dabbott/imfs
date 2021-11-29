@@ -1,4 +1,4 @@
-import { basename } from '../../path'
+import { basename } from '../path'
 import { Entries } from '../entries'
 import { Storage } from '../storage'
 import { Entry } from '../types'

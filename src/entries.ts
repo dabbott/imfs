@@ -1,6 +1,6 @@
 import { Entry, File, Directory } from './types'
 import { withOptions } from 'tree-visit'
-import { join } from '../path'
+import { join } from './path'
 
 function createFile<T>(data: T): File<T> {
   return { type: 'file', data }
@@ -38,15 +38,22 @@ function hasEntry<T, K extends string>(
   return name in directory.entries
 }
 
+export type NamedEntry<T> = [string, Entry<T>]
+
+function getNamedEntries<T>(namedEntry: NamedEntry<T>): NamedEntry<T>[] {
+  const [pathname, entry] = namedEntry
+
+  return entry.type === 'directory'
+    ? Object.entries(entry.entries).map(([key, value]) => [
+        join(pathname, key),
+        value,
+      ])
+    : []
+}
+
 function traversal<T>() {
   return withOptions<[string, Entry<T>]>({
-    getChildren: ([pathname, entry]) =>
-      entry.type === 'directory'
-        ? Object.entries(entry.entries).map(([key, value]) => [
-            join(pathname, key),
-            value,
-          ])
-        : [],
+    getChildren: getNamedEntries,
   })
 }
 

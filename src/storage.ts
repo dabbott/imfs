@@ -1,5 +1,5 @@
 import produce, { Draft } from 'immer'
-import { basename, dirname, join, normalize, sep } from '../path'
+import { basename, dirname, join, normalize, sep } from './path'
 import { Entries } from './entries'
 import { Entry } from './types'
 
