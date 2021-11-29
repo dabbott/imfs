@@ -22,11 +22,13 @@ it('read directory', () => {
 
   expect(Entries.readDirectory(directory)).toEqual(['a', 'nested'])
   expect(
-    Entries.readDirectory(Entries.getEntry(directory, 'nested') as Directory)
+    Entries.readDirectory(
+      Entries.getEntry(directory, 'nested') as Directory<Uint8Array>
+    )
   ).toEqual(['b'])
 
   expect(
-    Entries.Traverse.diagram(
+    Entries.traverse().diagram(
       ['/', directory],
       ([pathname, entry]) => `${pathname} (${entry.type})`
     )

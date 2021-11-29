@@ -1,8 +1,8 @@
-export type File = { type: 'file'; data: Uint8Array }
+export type File<T> = { type: 'file'; data: T }
 
-export type Directory = {
+export type Directory<T> = {
   type: 'directory'
-  entries: Record<string, Entry>
+  entries: Record<string, Entry<T>>
 }
 
-export type Entry = File | Directory
+export type Entry<T> = File<T> | Directory<T>

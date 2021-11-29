@@ -1,47 +1,54 @@
+import { Entry, File, Directory } from './types'
 import { withOptions } from 'tree-visit'
 import { join } from '../path'
-import { Entry, File, Directory } from './types'
 
-function createFile(data: Uint8Array): File {
+function createFile<T>(data: T): File<T> {
   return { type: 'file', data }
 }
 
-function createDirectory(entries: Directory['entries'] = {}): Directory {
+function createDirectory<T>(
+  entries: Directory<T>['entries'] = {}
+): Directory<T> {
   return { type: 'directory', entries }
 }
 
-function isFile(entry: Entry): entry is File {
+function isFile<T>(entry: Entry<T>): entry is File<T> {
   return entry.type === 'file'
 }
 
-function isDirectory(entry: Entry): entry is Directory {
+function isDirectory<T>(entry: Entry<T>): entry is Directory<T> {
   return entry.type === 'directory'
 }
 
-function readDirectory(directory: Directory) {
+function readDirectory<T>(directory: Directory<T>) {
   return Object.keys(directory.entries)
 }
 
-function getEntry(directory: Directory, name: string): Entry | undefined {
+function getEntry<T>(
+  directory: Directory<T>,
+  name: string
+): Entry<T> | undefined {
   return directory.entries[name]
 }
 
-function hasEntry<T extends string>(
-  directory: Directory,
-  name: T
-): directory is Directory & { value: { [key in T]: Entry } } {
+function hasEntry<T, K extends string>(
+  directory: Directory<T>,
+  name: K
+): directory is Directory<T> & { value: { [key in K]: Entry<T> } } {
   return name in directory.entries
 }
 
-const Traverse = withOptions<[string, Entry]>({
-  getChildren: ([pathname, entry]) =>
-    entry.type === 'directory'
-      ? Object.entries(entry.entries).map(([key, value]) => [
-          join(pathname, key),
-          value,
-        ])
-      : [],
-})
+function traverse<T>() {
+  return withOptions<[string, Entry<T>]>({
+    getChildren: ([pathname, entry]) =>
+      entry.type === 'directory'
+        ? Object.entries(entry.entries).map(([key, value]) => [
+            join(pathname, key),
+            value,
+          ])
+        : [],
+  })
+}
 
 export const Entries = {
   createFile,
@@ -51,5 +58,5 @@ export const Entries = {
   readDirectory,
   getEntry,
   hasEntry,
-  Traverse,
+  traverse,
 }

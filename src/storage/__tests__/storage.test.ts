@@ -3,8 +3,8 @@ import { Entries } from '../entries'
 import { Storage } from '../storage'
 import { Entry } from '../types'
 
-function diagram(root: Entry) {
-  return Entries.Traverse.diagram(
+function diagram<T>(root: Entry<T>) {
+  return Entries.traverse().diagram(
     ['/', root],
     ([pathname, entry]) =>
       `${pathname === '/' ? '/' : basename(pathname)} (${entry.type})`
@@ -57,10 +57,10 @@ it('reading', () => {
 })
 
 it('writing', () => {
-  const root = Entries.createDirectory()
+  const root = Entries.createDirectory<string>()
   const withA = Storage.makeDirectory(root, '/a')
   const withAB = Storage.makeDirectory(withA, '/b')
-  const withAC = Storage.writeFile(withA, '/c', new Uint8Array([0, 1, 2, 3]))
+  const withAC = Storage.writeFile(withA, '/c', 'hello')
 
   expect(diagram(root)).toMatchSnapshot()
   expect(diagram(withA)).toMatchSnapshot()

@@ -1,4 +1,4 @@
-import produce from 'immer'
+import produce, { Draft } from 'immer'
 import { basename, dirname, join, normalize, sep } from '../path'
 import { Entries } from './entries'
 import { Entry } from './types'
@@ -27,11 +27,11 @@ const getComponentsInternal = (pathlike: PathLike) => {
   return typeof pathlike === 'string' ? getPathComponents(pathlike) : pathlike
 }
 
-function getEntry(root: Entry, pathlike: PathLike): Entry {
+function getEntry<T>(root: Entry<T>, pathlike: PathLike): Entry<T> {
   const components = getComponentsInternal(pathlike)
 
   let i = 0
-  let current: Entry = root
+  let current: Entry<T> = root
 
   while (i < components.length) {
     let component = components[i]
@@ -56,7 +56,7 @@ function getEntry(root: Entry, pathlike: PathLike): Entry {
   return current
 }
 
-function readFile(root: Entry, pathlike: PathLike): Uint8Array {
+function readFile<T>(root: Entry<T>, pathlike: PathLike): T {
   const components = getComponentsInternal(pathlike)
   const entry = getEntry(root, components)
 
@@ -67,7 +67,7 @@ function readFile(root: Entry, pathlike: PathLike): Uint8Array {
   return entry.data
 }
 
-function readDirectory(root: Entry, pathlike: PathLike): string[] {
+function readDirectory<T>(root: Entry<T>, pathlike: PathLike): string[] {
   const components = getComponentsInternal(pathlike)
   const entry = getEntry(root, components)
 
@@ -90,7 +90,7 @@ function getNewAndParentName(pathlike: PathLike) {
   return { parentName, newName }
 }
 
-function makeDirectory<T extends Entry>(root: T, pathlike: PathLike): T {
+function makeDirectory<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
@@ -106,11 +106,11 @@ function makeDirectory<T extends Entry>(root: T, pathlike: PathLike): T {
   })
 }
 
-function writeFile<T extends Entry>(
-  root: T,
+function writeFile<T, U extends Entry<T>>(
+  root: U,
   pathlike: PathLike,
-  data: Uint8Array
-): T {
+  data: T
+): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
@@ -122,7 +122,7 @@ function writeFile<T extends Entry>(
       )
     }
 
-    parent.entries[newName] = Entries.createFile(data)
+    parent.entries[newName] = Entries.createFile(data as Draft<T>)
   })
 }
 
