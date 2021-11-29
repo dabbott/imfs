@@ -27,7 +27,7 @@ it('read directory', () => {
   expect(Nodes.readDirectory(directory)).toEqual(['a', 'nested'])
   expect(
     Nodes.readDirectory(
-      Nodes.getNode(directory, 'nested') as Directory<Uint8Array>
+      Nodes.getEntry(directory, 'nested') as Directory<Uint8Array>
     )
   ).toEqual(['b'])
 

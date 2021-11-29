@@ -42,7 +42,7 @@ function getNode<Data>(root: Node<Data>, pathlike: PathLike): Node<Data> {
       )
     }
 
-    const node = Nodes.getNode(current, component)
+    const node = Nodes.getEntry(current, component)
 
     if (!node) {
       throw new Error(`File ${join(...components)} not found`)
@@ -121,7 +121,7 @@ function makeDirectory<Data, U extends Node<Data>>(
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    const existing = Nodes.getNode(parent, newName)
+    const existing = Nodes.getEntry(parent, newName)
 
     // Already a directory
     if (existing && Nodes.isDirectory(parent.entries[newName])) {

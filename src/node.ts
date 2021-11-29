@@ -23,14 +23,14 @@ function readDirectory<Data>(directory: Directory<Data>) {
   return Object.keys(directory.entries)
 }
 
-function getNode<Data>(
+function getEntry<Data>(
   directory: Directory<Data>,
   name: string
 ): Node<Data> | undefined {
   return directory.entries[name]
 }
 
-function hasNode<Data, Key extends string>(
+function hasEntry<Data, Key extends string>(
   directory: Directory<Data>,
   name: Key
 ): directory is Directory<Data> & { value: { [key in Key]: Node<Data> } } {
@@ -58,7 +58,7 @@ export const Nodes = {
   isFile,
   isDirectory,
   readDirectory,
-  getNode,
-  hasNode,
+  getEntry,
+  hasEntry,
   getNamedEntries,
 }
