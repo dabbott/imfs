@@ -2,7 +2,7 @@ export type File<T> = { type: 'file'; data: T }
 
 export type Directory<T> = {
   type: 'directory'
-  entries: Record<string, Entry<T>>
+  entries: Record<string, Node<T>>
 }
 
-export type Entry<T> = File<T> | Directory<T>
+export type Node<T> = File<T> | Directory<T>

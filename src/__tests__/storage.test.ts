@@ -1,13 +1,13 @@
 import { basename } from '../path'
-import { Entries } from '../entries'
+import { Nodes } from '../node'
 import { Storage } from '../storage'
-import { Entry } from '../types'
+import { Node } from '../types'
 
-function diagram<T>(root: Entry<T>) {
-  return Entries.traversal().diagram(
+function diagram<T>(root: Node<T>) {
+  return Nodes.traversal().diagram(
     ['/', root],
-    ([pathname, entry]) =>
-      `${pathname === '/' ? '/' : basename(pathname)} (${entry.type})`
+    ([pathname, node]) =>
+      `${pathname === '/' ? '/' : basename(pathname)} (${node.type})`
   )
 }
 
@@ -19,37 +19,37 @@ it('gets path components', () => {
   expect(Storage.getPathComponents('/nested/b')).toEqual(['nested', 'b'])
 })
 
-it('gets entry', () => {
-  const a = Entries.createFile(new Uint8Array())
-  const b = Entries.createFile(new Uint8Array())
-  const nested = Entries.createDirectory({ b })
-  const root = Entries.createDirectory({ a, nested })
+it('gets node', () => {
+  const a = Nodes.createFile(new Uint8Array())
+  const b = Nodes.createFile(new Uint8Array())
+  const nested = Nodes.createDirectory({ b })
+  const root = Nodes.createDirectory({ a, nested })
 
-  expect(Storage.getEntry(root, '/')).toEqual(root)
-  expect(Storage.getEntry(root, '.')).toEqual(root)
-  expect(Storage.getEntry(root, '/a')).toEqual(a)
-  expect(Storage.getEntry(root, 'a')).toEqual(a)
-  expect(Storage.getEntry(root, '/nested')).toEqual(nested)
-  expect(Storage.getEntry(root, '/nested/b')).toEqual(b)
-  expect(Storage.getEntry(root, ['nested', 'b'])).toEqual(b)
+  expect(Storage.getNode(root, '/')).toEqual(root)
+  expect(Storage.getNode(root, '.')).toEqual(root)
+  expect(Storage.getNode(root, '/a')).toEqual(a)
+  expect(Storage.getNode(root, 'a')).toEqual(a)
+  expect(Storage.getNode(root, '/nested')).toEqual(nested)
+  expect(Storage.getNode(root, '/nested/b')).toEqual(b)
+  expect(Storage.getNode(root, ['nested', 'b'])).toEqual(b)
 
-  expect(() => Storage.getEntry(root, '..')).toThrowError(
+  expect(() => Storage.getNode(root, '..')).toThrowError(
     "Invalid path .., can't go up past root"
   )
-  expect(() => Storage.getEntry(root, '/c')).toThrowError('File c not found')
-  expect(() => Storage.getEntry(root, '/nested/c')).toThrowError(
+  expect(() => Storage.getNode(root, '/c')).toThrowError('File c not found')
+  expect(() => Storage.getNode(root, '/nested/c')).toThrowError(
     'File nested/c not found'
   )
-  expect(() => Storage.getEntry(root, '/nested/b/c')).toThrowError(
+  expect(() => Storage.getNode(root, '/nested/b/c')).toThrowError(
     'File nested/b is not a directory'
   )
 })
 
 it('reading', () => {
-  const a = Entries.createFile(new Uint8Array())
-  const b = Entries.createFile(new Uint8Array())
-  const nested = Entries.createDirectory({ b })
-  const root = Entries.createDirectory({ a, nested })
+  const a = Nodes.createFile(new Uint8Array())
+  const b = Nodes.createFile(new Uint8Array())
+  const nested = Nodes.createDirectory({ b })
+  const root = Nodes.createDirectory({ a, nested })
 
   expect(Storage.readDirectory(root, '/')).toEqual(['a', 'nested'])
   expect(Storage.readDirectory(root, '/nested')).toEqual(['b'])
@@ -57,7 +57,7 @@ it('reading', () => {
 })
 
 it('writing', () => {
-  const root = Entries.createDirectory<string>()
+  const root = Nodes.createDirectory<string>()
   const withA = Storage.makeDirectory(root, '/a')
   const withAB = Storage.makeDirectory(withA, '/b')
   const withAC = Storage.writeFile(withA, '/c', 'hello')
@@ -69,7 +69,7 @@ it('writing', () => {
 })
 
 it('removing', () => {
-  const root = Entries.createDirectory<string>()
+  const root = Nodes.createDirectory<string>()
   const withA = Storage.makeDirectory(root, '/a')
   const withAC = Storage.writeFile(withA, '/a/c', 'hello')
 

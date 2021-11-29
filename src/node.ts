@@ -1,4 +1,4 @@
-import { Entry, File, Directory } from './types'
+import { Node, File, Directory } from './types'
 import { withOptions } from 'tree-visit'
 import { join } from './path'
 
@@ -12,39 +12,39 @@ function createDirectory<T>(
   return { type: 'directory', entries }
 }
 
-function isFile<T>(entry: Entry<T>): entry is File<T> {
-  return entry.type === 'file'
+function isFile<T>(node: Node<T>): node is File<T> {
+  return node.type === 'file'
 }
 
-function isDirectory<T>(entry: Entry<T>): entry is Directory<T> {
-  return entry.type === 'directory'
+function isDirectory<T>(node: Node<T>): node is Directory<T> {
+  return node.type === 'directory'
 }
 
 function readDirectory<T>(directory: Directory<T>) {
   return Object.keys(directory.entries)
 }
 
-function getEntry<T>(
+function getNode<T>(
   directory: Directory<T>,
   name: string
-): Entry<T> | undefined {
+): Node<T> | undefined {
   return directory.entries[name]
 }
 
-function hasEntry<T, K extends string>(
+function hasNode<T, K extends string>(
   directory: Directory<T>,
   name: K
-): directory is Directory<T> & { value: { [key in K]: Entry<T> } } {
+): directory is Directory<T> & { value: { [key in K]: Node<T> } } {
   return name in directory.entries
 }
 
-export type NamedEntry<T> = [string, Entry<T>]
+export type NamedEntry<T> = [string, Node<T>]
 
 function getNamedEntries<T>(namedEntry: NamedEntry<T>): NamedEntry<T>[] {
-  const [pathname, entry] = namedEntry
+  const [pathname, node] = namedEntry
 
-  return entry.type === 'directory'
-    ? Object.entries(entry.entries).map(([key, value]) => [
+  return node.type === 'directory'
+    ? Object.entries(node.entries).map(([key, value]) => [
         join(pathname, key),
         value,
       ])
@@ -52,18 +52,18 @@ function getNamedEntries<T>(namedEntry: NamedEntry<T>): NamedEntry<T>[] {
 }
 
 function traversal<T>() {
-  return withOptions<[string, Entry<T>]>({
+  return withOptions<[string, Node<T>]>({
     getChildren: getNamedEntries,
   })
 }
 
-export const Entries = {
+export const Nodes = {
   createFile,
   createDirectory,
   isFile,
   isDirectory,
   readDirectory,
-  getEntry,
-  hasEntry,
+  getNode,
+  hasNode,
   traversal,
 }

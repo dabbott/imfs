@@ -1,7 +1,7 @@
 import produce, { Draft } from 'immer'
 import { basename, dirname, join, normalize, sep } from './path'
-import { Entries } from './entries'
-import { Entry } from './types'
+import { Nodes } from './node'
+import { Node } from './types'
 
 type PathLike = string | string[]
 
@@ -27,11 +27,11 @@ const getComponentsInternal = (pathlike: PathLike) => {
   return typeof pathlike === 'string' ? getPathComponents(pathlike) : pathlike
 }
 
-function getEntry<T>(root: Entry<T>, pathlike: PathLike): Entry<T> {
+function getNode<T>(root: Node<T>, pathlike: PathLike): Node<T> {
   const components = getComponentsInternal(pathlike)
 
   let i = 0
-  let current: Entry<T> = root
+  let current: Node<T> = root
 
   while (i < components.length) {
     let component = components[i]
@@ -42,13 +42,13 @@ function getEntry<T>(root: Entry<T>, pathlike: PathLike): Entry<T> {
       )
     }
 
-    const entry = Entries.getEntry(current, component)
+    const node = Nodes.getNode(current, component)
 
-    if (!entry) {
+    if (!node) {
       throw new Error(`File ${join(...components)} not found`)
     }
 
-    current = entry
+    current = node
 
     i++
   }
@@ -56,44 +56,44 @@ function getEntry<T>(root: Entry<T>, pathlike: PathLike): Entry<T> {
   return current
 }
 
-function setEntry<T, U extends Entry<T>>(
+function setNode<T, U extends Node<T>>(
   root: U,
   pathlike: PathLike,
-  entry: Entry<T>
+  node: Node<T>
 ): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
-    const parent = getEntry(draft, parentName)
+    const parent = getNode(draft, parentName)
 
-    if (!Entries.isDirectory(parent)) {
+    if (!Nodes.isDirectory(parent)) {
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    parent.entries[newName] = entry as Draft<Entry<T>>
+    parent.entries[newName] = node as Draft<Node<T>>
   })
 }
 
-function readFile<T>(root: Entry<T>, pathlike: PathLike): T {
+function readFile<T>(root: Node<T>, pathlike: PathLike): T {
   const components = getComponentsInternal(pathlike)
-  const entry = getEntry(root, components)
+  const node = getNode(root, components)
 
-  if (!Entries.isFile(entry)) {
+  if (!Nodes.isFile(node)) {
     throw new Error(`Can't read, ${join(...components)} not a file`)
   }
 
-  return entry.data
+  return node.data
 }
 
-function readDirectory<T>(root: Entry<T>, pathlike: PathLike): string[] {
+function readDirectory<T>(root: Node<T>, pathlike: PathLike): string[] {
   const components = getComponentsInternal(pathlike)
-  const entry = getEntry(root, components)
+  const node = getNode(root, components)
 
-  if (!Entries.isDirectory(entry)) {
+  if (!Nodes.isDirectory(node)) {
     throw new Error(`Can't read, ${join(...components)} not a directory`)
   }
 
-  return Entries.readDirectory(entry)
+  return Nodes.readDirectory(node)
 }
 
 function getNewAndParentName(pathlike: PathLike) {
@@ -108,42 +108,42 @@ function getNewAndParentName(pathlike: PathLike) {
   return { parentName, newName }
 }
 
-function makeDirectory<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
+function makeDirectory<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
-    const parent = getEntry(draft, parentName)
+    const parent = getNode(draft, parentName)
 
-    if (!Entries.isDirectory(parent)) {
+    if (!Nodes.isDirectory(parent)) {
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    const existing = Entries.getEntry(parent, newName)
+    const existing = Nodes.getNode(parent, newName)
 
     // Already a directory
-    if (existing && Entries.isDirectory(parent.entries[newName])) {
+    if (existing && Nodes.isDirectory(parent.entries[newName])) {
       return
     }
 
-    parent.entries[newName] = Entries.createDirectory()
+    parent.entries[newName] = Nodes.createDirectory()
   })
 }
 
-function writeFile<T, U extends Entry<T>>(
+function writeFile<T, U extends Node<T>>(
   root: U,
   pathlike: PathLike,
   data: T
 ): U {
-  return setEntry(root, pathlike, Entries.createFile(data))
+  return setNode(root, pathlike, Nodes.createFile(data))
 }
 
-function removeFile<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
+function removeFile<T, U extends Node<T>>(root: U, pathlike: PathLike): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
-    const parent = getEntry(draft, parentName)
+    const parent = getNode(draft, parentName)
 
-    if (!Entries.isDirectory(parent)) {
+    if (!Nodes.isDirectory(parent)) {
       throw new Error(
         `Can't remove file ${newName}, ${parentName} not a directory`
       )
@@ -155,8 +155,8 @@ function removeFile<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
 
 export const Storage = {
   getPathComponents,
-  getEntry,
-  setEntry,
+  getNode,
+  setNode,
   readFile,
   readDirectory,
   makeDirectory,
