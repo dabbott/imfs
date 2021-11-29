@@ -67,3 +67,13 @@ it('writing', () => {
   expect(diagram(withAB)).toMatchSnapshot()
   expect(diagram(withAC)).toMatchSnapshot()
 })
+
+it('removing', () => {
+  const root = Entries.createDirectory<string>()
+  const withA = Storage.makeDirectory(root, '/a')
+  const withAC = Storage.writeFile(withA, '/a/c', 'hello')
+
+  expect(diagram(withAC)).toMatchSnapshot()
+  expect(diagram(Storage.removeFile(withAC, '/a/c'))).toMatchSnapshot()
+  expect(diagram(Storage.removeFile(withAC, '/a'))).toMatchSnapshot()
+})

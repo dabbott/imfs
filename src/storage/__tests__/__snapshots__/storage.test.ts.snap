@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`removing 1`] = `
+"/ (directory)
+└── a (directory)
+    └── c (file)"
+`;
+
+exports[`removing 2`] = `
+"/ (directory)
+└── a (directory)"
+`;
+
+exports[`removing 3`] = `"/ (directory)"`;
+
 exports[`writing 1`] = `"/ (directory)"`;
 
 exports[`writing 2`] = `

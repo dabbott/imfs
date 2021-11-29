@@ -56,6 +56,24 @@ function getEntry<T>(root: Entry<T>, pathlike: PathLike): Entry<T> {
   return current
 }
 
+function setEntry<T, U extends Entry<T>>(
+  root: U,
+  pathlike: PathLike,
+  entry: Entry<T>
+): U {
+  const { parentName, newName } = getNewAndParentName(pathlike)
+
+  return produce(root, (draft) => {
+    const parent = getEntry(draft, parentName)
+
+    if (!Entries.isDirectory(parent)) {
+      throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
+    }
+
+    parent.entries[newName] = entry as Draft<Entry<T>>
+  })
+}
+
 function readFile<T>(root: Entry<T>, pathlike: PathLike): T {
   const components = getComponentsInternal(pathlike)
   const entry = getEntry(root, components)
@@ -97,9 +115,14 @@ function makeDirectory<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
     const parent = getEntry(draft, parentName)
 
     if (!Entries.isDirectory(parent)) {
-      throw new Error(
-        `Can't create directory ${newName}, ${parentName} not a directory`
-      )
+      throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
+    }
+
+    const existing = Entries.getEntry(parent, newName)
+
+    // Already a directory
+    if (existing && Entries.isDirectory(parent.entries[newName])) {
+      return
     }
 
     parent.entries[newName] = Entries.createDirectory()
@@ -111,6 +134,10 @@ function writeFile<T, U extends Entry<T>>(
   pathlike: PathLike,
   data: T
 ): U {
+  return setEntry(root, pathlike, Entries.createFile(data))
+}
+
+function removeFile<T, U extends Entry<T>>(root: U, pathlike: PathLike): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
@@ -118,19 +145,21 @@ function writeFile<T, U extends Entry<T>>(
 
     if (!Entries.isDirectory(parent)) {
       throw new Error(
-        `Can't create file ${newName}, ${parentName} not a directory`
+        `Can't remove file ${newName}, ${parentName} not a directory`
       )
     }
 
-    parent.entries[newName] = Entries.createFile(data as Draft<T>)
+    delete parent.entries[newName]
   })
 }
 
 export const Storage = {
   getPathComponents,
   getEntry,
+  setEntry,
   readFile,
   readDirectory,
   makeDirectory,
   writeFile,
+  removeFile,
 }
