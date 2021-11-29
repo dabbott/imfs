@@ -1,5 +1,4 @@
 import { Node, File, Directory } from './types'
-import { withOptions } from 'tree-visit'
 import { join } from './path'
 
 function createFile<Data>(data: Data): File<Data> {
@@ -53,12 +52,6 @@ function getNamedEntries<Data>(
     : []
 }
 
-function traversal<Data>() {
-  return withOptions<[string, Node<Data>]>({
-    getChildren: getNamedEntries,
-  })
-}
-
 export const Nodes = {
   createFile,
   createDirectory,
@@ -67,5 +60,5 @@ export const Nodes = {
   readDirectory,
   getNode,
   hasNode,
-  traversal,
+  getNamedEntries,
 }

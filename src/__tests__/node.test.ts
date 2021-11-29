@@ -1,4 +1,9 @@
-import { Directory, Nodes } from '..'
+import { withOptions } from 'tree-visit'
+import { Directory, NamedEntry, Nodes } from '..'
+
+const { diagram } = withOptions<NamedEntry<Uint8Array>>({
+  getChildren: Nodes.getNamedEntries,
+})
 
 it('node tools', () => {
   const file = Nodes.createFile(Uint8Array.from([0, 1, 2, 3]))
@@ -27,7 +32,7 @@ it('read directory', () => {
   ).toEqual(['b'])
 
   expect(
-    Nodes.traversal().diagram(
+    diagram(
       ['/', directory],
       ([pathname, node]) => `${pathname} (${node.type})`
     )

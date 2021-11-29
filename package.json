@@ -17,18 +17,14 @@
   "repository": "https://github.com/dabbott/tree-visit",
   "license": "MIT",
   "dependencies": {
-    "base64-arraybuffer": "^1.0.1",
-    "buffer": "^6.0.3",
-    "buffs": "^0.6.0",
-    "immer": "^9.0.7",
-    "tree-visit": "^0.1.0"
+    "immer": "^9.0.7"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.7",
     "jest": "^27.3.1",
-    "memfs": "^3.4.0",
     "prettier": "^2.4.1",
+    "tree-visit": "^0.1.0",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"

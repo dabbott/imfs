@@ -1,7 +1,12 @@
-import { Node, Nodes, path, Volume } from '..'
+import { withOptions } from 'tree-visit'
+import { NamedEntry, Node, Nodes, path, Volume } from '..'
 
-function diagram<Data>(root: Node<Data>) {
-  return Nodes.traversal().diagram(
+const { diagram: nodeDiagram } = withOptions<NamedEntry<string>>({
+  getChildren: Nodes.getNamedEntries,
+})
+
+function diagram(root: Node<string>) {
+  return nodeDiagram(
     ['/', root],
     ([pathname, node]) =>
       `${pathname === '/' ? '/' : path.basename(pathname)} (${node.type})`
