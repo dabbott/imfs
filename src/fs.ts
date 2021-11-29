@@ -1,7 +1,7 @@
 // import { encode } from 'base64-arraybuffer'
 import type { IFS } from 'buffs'
 import type { ObjectEncodingOptions, PathOrFileDescriptor, Stats } from 'fs'
-import * as Storage from './storage'
+import * as Storage from './storage/storage'
 import { TextEncoder } from 'util'
 import { Buffer } from 'buffer'
 

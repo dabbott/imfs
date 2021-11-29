@@ -12,22 +12,6 @@ it('entry tools', () => {
   expect(Entries.isDirectory(file)).toBe(false)
 })
 
-// it('gets entries by path', () => {
-//   const directory = {
-//     a: new Uint8Array(),
-//     nested: {
-//       b: new Uint8Array(),
-//     },
-//   }
-
-//   expect(Storage.getEntry(directory, '.')).toEqual(directory)
-//   expect(Storage.getEntry(directory, '/')).toEqual(directory)
-//   expect(Storage.getEntry(directory, 'a')).toEqual(directory.a)
-//   expect(Storage.getEntry(directory, 'fake')).toEqual(undefined)
-//   expect(Storage.getEntry(directory, 'nested/b')).toEqual(directory.nested.b)
-//   expect(Storage.getEntry(directory, 'nested/fake')).toEqual(undefined)
-// })
-
 it('read directory', () => {
   const directory = Entries.createDirectory({
     a: Entries.createFile(new Uint8Array()),
@@ -42,7 +26,7 @@ it('read directory', () => {
   ).toEqual(['b'])
 
   expect(
-    Entries.TraverseEntries.diagram(
+    Entries.Traverse.diagram(
       ['/', directory],
       ([pathname, entry]) => `${pathname} (${entry.type})`
     )

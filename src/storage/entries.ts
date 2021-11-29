@@ -33,12 +33,7 @@ function hasEntry<T extends string>(
   return name in directory.entries
 }
 
-const Traverse = withOptions<Entry>({
-  getChildren: (entry) =>
-    entry.type === 'directory' ? Object.values(entry.entries) : [],
-})
-
-const TraverseEntries = withOptions<[string, Entry]>({
+const Traverse = withOptions<[string, Entry]>({
   getChildren: ([pathname, entry]) =>
     entry.type === 'directory'
       ? Object.entries(entry.entries).map(([key, value]) => [
@@ -57,5 +52,4 @@ export const Entries = {
   getEntry,
   hasEntry,
   Traverse,
-  TraverseEntries,
 }
