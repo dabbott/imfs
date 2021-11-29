@@ -4,7 +4,7 @@ import { Storage } from '../storage'
 import { Entry } from '../types'
 
 function diagram<T>(root: Entry<T>) {
-  return Entries.traverse().diagram(
+  return Entries.traversal().diagram(
     ['/', root],
     ([pathname, entry]) =>
       `${pathname === '/' ? '/' : basename(pathname)} (${entry.type})`

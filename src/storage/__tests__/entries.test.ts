@@ -28,7 +28,7 @@ it('read directory', () => {
   ).toEqual(['b'])
 
   expect(
-    Entries.traverse().diagram(
+    Entries.traversal().diagram(
       ['/', directory],
       ([pathname, entry]) => `${pathname} (${entry.type})`
     )

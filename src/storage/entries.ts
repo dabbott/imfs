@@ -38,7 +38,7 @@ function hasEntry<T, K extends string>(
   return name in directory.entries
 }
 
-function traverse<T>() {
+function traversal<T>() {
   return withOptions<[string, Entry<T>]>({
     getChildren: ([pathname, entry]) =>
       entry.type === 'directory'
@@ -58,5 +58,5 @@ export const Entries = {
   readDirectory,
   getEntry,
   hasEntry,
-  traverse,
+  traversal,
 }
