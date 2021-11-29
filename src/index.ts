@@ -1,4 +1,5 @@
 export * from './types'
 export * from './node'
+export * from './entries'
 export * from './volume'
 export * as path from './path'

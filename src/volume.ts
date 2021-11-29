@@ -42,7 +42,7 @@ function getNode<Data>(root: Node<Data>, pathlike: PathLike): Node<Data> {
       )
     }
 
-    const node = Nodes.getEntry(current, component)
+    const node = Nodes.getChild(current, component)
 
     if (!node) {
       throw new Error(`File ${join(...components)} not found`)
@@ -70,7 +70,7 @@ function setNode<Data, U extends Node<Data>>(
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    parent.entries[newName] = node as Draft<Node<Data>>
+    parent.children[newName] = node as Draft<Node<Data>>
   })
 }
 
@@ -121,14 +121,14 @@ function makeDirectory<Data, U extends Node<Data>>(
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    const existing = Nodes.getEntry(parent, newName)
+    const existing = Nodes.getChild(parent, newName)
 
     // Already a directory
-    if (existing && Nodes.isDirectory(parent.entries[newName])) {
+    if (existing && Nodes.isDirectory(parent.children[newName])) {
       return
     }
 
-    parent.entries[newName] = Nodes.createDirectory()
+    parent.children[newName] = Nodes.createDirectory()
   })
 }
 
@@ -155,7 +155,7 @@ function removeFile<Data, U extends Node<Data>>(
       )
     }
 
-    delete parent.entries[newName]
+    delete parent.children[newName]
   })
 }
 

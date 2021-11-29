@@ -1,13 +1,13 @@
 import { withOptions } from 'tree-visit'
-import { NamedEntry, Node, Nodes, path, Volume } from '..'
+import { Entries, Entry, Node, Nodes, path, Volume } from '..'
 
-const { diagram: nodeDiagram } = withOptions<NamedEntry<string>>({
-  getChildren: Nodes.getNamedEntries,
+const { diagram: nodeDiagram } = withOptions<Entry<string>>({
+  getChildren: Entries.getEntries,
 })
 
 function diagram(root: Node<string>) {
   return nodeDiagram(
-    ['/', root],
+    Entries.createEntry('/', root),
     ([pathname, node]) =>
       `${pathname === '/' ? '/' : path.basename(pathname)} (${node.type})`
   )

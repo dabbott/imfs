@@ -1,8 +1,8 @@
 import { withOptions } from 'tree-visit'
-import { Directory, NamedEntry, Nodes } from '..'
+import { Directory, Entries, Entry, Nodes } from '..'
 
-const { diagram } = withOptions<NamedEntry<Uint8Array>>({
-  getChildren: Nodes.getNamedEntries,
+const { diagram } = withOptions<Entry<Uint8Array>>({
+  getChildren: Entries.getEntries,
 })
 
 it('node tools', () => {
@@ -27,13 +27,13 @@ it('read directory', () => {
   expect(Nodes.readDirectory(directory)).toEqual(['a', 'nested'])
   expect(
     Nodes.readDirectory(
-      Nodes.getEntry(directory, 'nested') as Directory<Uint8Array>
+      Nodes.getChild(directory, 'nested') as Directory<Uint8Array>
     )
   ).toEqual(['b'])
 
   expect(
     diagram(
-      ['/', directory],
+      Entries.createEntry('/', directory),
       ([pathname, node]) => `${pathname} (${node.type})`
     )
   ).toMatchSnapshot()

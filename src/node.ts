@@ -1,4 +1,4 @@
-import { Node, File, Directory, NamedEntry } from './types'
+import { Node, File, Directory, Entry } from './types'
 import { join } from './path'
 
 function createFile<Data>(data: Data): File<Data> {
@@ -6,9 +6,9 @@ function createFile<Data>(data: Data): File<Data> {
 }
 
 function createDirectory<Data>(
-  entries: Directory<Data>['entries'] = {}
+  children: Directory<Data>['children'] = {}
 ): Directory<Data> {
-  return { type: 'directory', entries }
+  return { type: 'directory', children }
 }
 
 function isFile<Data>(node: Node<Data>): node is File<Data> {
@@ -20,34 +20,21 @@ function isDirectory<Data>(node: Node<Data>): node is Directory<Data> {
 }
 
 function readDirectory<Data>(directory: Directory<Data>) {
-  return Object.keys(directory.entries)
+  return Object.keys(directory.children)
 }
 
-function getEntry<Data>(
+function getChild<Data>(
   directory: Directory<Data>,
   name: string
 ): Node<Data> | undefined {
-  return directory.entries[name]
+  return directory.children[name]
 }
 
-function hasEntry<Data, Key extends string>(
+function hasChild<Data, Key extends string>(
   directory: Directory<Data>,
   name: Key
 ): directory is Directory<Data> & { value: { [key in Key]: Node<Data> } } {
-  return name in directory.entries
-}
-
-function getNamedEntries<Data>(
-  namedEntry: NamedEntry<Data>
-): NamedEntry<Data>[] {
-  const [pathname, node] = namedEntry
-
-  return node.type === 'directory'
-    ? Object.entries(node.entries).map(([key, value]) => [
-        join(pathname, key),
-        value,
-      ])
-    : []
+  return name in directory.children
 }
 
 export const Nodes = {
@@ -56,7 +43,6 @@ export const Nodes = {
   isFile,
   isDirectory,
   readDirectory,
-  getEntry,
-  hasEntry,
-  getNamedEntries,
+  getChild,
+  hasChild,
 }
