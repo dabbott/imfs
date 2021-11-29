@@ -6,7 +6,7 @@ function createFile(data: Uint8Array): File {
   return { type: 'file', data }
 }
 
-function createDirectory(entries: Directory['entries']): Directory {
+function createDirectory(entries: Directory['entries'] = {}): Directory {
   return { type: 'directory', entries }
 }
 

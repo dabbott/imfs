@@ -1,5 +1,15 @@
+import { basename } from '../../path'
 import { Entries } from '../entries'
 import { Storage } from '../storage'
+import { Entry } from '../types'
+
+function diagram(root: Entry) {
+  return Entries.Traverse.diagram(
+    ['/', root],
+    ([pathname, entry]) =>
+      `${pathname === '/' ? '/' : basename(pathname)} (${entry.type})`
+  )
+}
 
 it('gets path components', () => {
   expect(Storage.getPathComponents('/')).toEqual([])
@@ -12,32 +22,48 @@ it('gets path components', () => {
 it('gets entry', () => {
   const a = Entries.createFile(new Uint8Array())
   const b = Entries.createFile(new Uint8Array())
-  const nested = Entries.createDirectory({
-    b,
-  })
-  const directory = Entries.createDirectory({
-    a,
-    nested,
-  })
+  const nested = Entries.createDirectory({ b })
+  const root = Entries.createDirectory({ a, nested })
 
-  expect(Storage.getEntry(directory, '/')).toEqual(directory)
-  expect(Storage.getEntry(directory, '.')).toEqual(directory)
-  expect(Storage.getEntry(directory, '/a')).toEqual(a)
-  expect(Storage.getEntry(directory, 'a')).toEqual(a)
-  expect(Storage.getEntry(directory, '/nested')).toEqual(nested)
-  expect(Storage.getEntry(directory, '/nested/b')).toEqual(b)
-  expect(Storage.getEntry(directory, ['nested', 'b'])).toEqual(b)
+  expect(Storage.getEntry(root, '/')).toEqual(root)
+  expect(Storage.getEntry(root, '.')).toEqual(root)
+  expect(Storage.getEntry(root, '/a')).toEqual(a)
+  expect(Storage.getEntry(root, 'a')).toEqual(a)
+  expect(Storage.getEntry(root, '/nested')).toEqual(nested)
+  expect(Storage.getEntry(root, '/nested/b')).toEqual(b)
+  expect(Storage.getEntry(root, ['nested', 'b'])).toEqual(b)
 
-  expect(() => Storage.getEntry(directory, '..')).toThrowError(
+  expect(() => Storage.getEntry(root, '..')).toThrowError(
     "Invalid path .., can't go up past root"
   )
-  expect(() => Storage.getEntry(directory, '/c')).toThrowError(
-    'File c not found'
-  )
-  expect(() => Storage.getEntry(directory, '/nested/c')).toThrowError(
+  expect(() => Storage.getEntry(root, '/c')).toThrowError('File c not found')
+  expect(() => Storage.getEntry(root, '/nested/c')).toThrowError(
     'File nested/c not found'
   )
-  expect(() => Storage.getEntry(directory, '/nested/b/c')).toThrowError(
+  expect(() => Storage.getEntry(root, '/nested/b/c')).toThrowError(
     'File nested/b is not a directory'
   )
+})
+
+it('reading', () => {
+  const a = Entries.createFile(new Uint8Array())
+  const b = Entries.createFile(new Uint8Array())
+  const nested = Entries.createDirectory({ b })
+  const root = Entries.createDirectory({ a, nested })
+
+  expect(Storage.readDirectory(root, '/')).toEqual(['a', 'nested'])
+  expect(Storage.readDirectory(root, '/nested')).toEqual(['b'])
+  expect(Storage.readFile(root, '/nested/b')).toEqual(b.data)
+})
+
+it('writing', () => {
+  const root = Entries.createDirectory()
+  const withA = Storage.makeDirectory(root, '/a')
+  const withAB = Storage.makeDirectory(withA, '/b')
+  const withAC = Storage.writeFile(withA, '/c', new Uint8Array([0, 1, 2, 3]))
+
+  expect(diagram(root)).toMatchSnapshot()
+  expect(diagram(withA)).toMatchSnapshot()
+  expect(diagram(withAB)).toMatchSnapshot()
+  expect(diagram(withAC)).toMatchSnapshot()
 })

@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writing 1`] = `"/ (directory)"`;
+
+exports[`writing 2`] = `
+"/ (directory)
+└── a (directory)"
+`;
+
+exports[`writing 3`] = `
+"/ (directory)
+├── a (directory)
+└── b (directory)"
+`;
+
+exports[`writing 4`] = `
+"/ (directory)
+├── a (directory)
+└── c (file)"
+`;
