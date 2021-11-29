@@ -1,7 +1,7 @@
 import produce, { Draft } from 'immer'
 import { basename, dirname, join, normalize, sep } from './path'
 import { Nodes } from './node'
-import { Node } from './types'
+import { Directory, Node } from './types'
 
 type PathLike = string | string[]
 
@@ -27,11 +27,14 @@ const getComponentsInternal = (pathlike: PathLike) => {
   return typeof pathlike === 'string' ? getPathComponents(pathlike) : pathlike
 }
 
-function getNode<Data>(root: Node<Data>, pathlike: PathLike): Node<Data> {
+function getNode<Data, Metadata>(
+  root: Node<Data, Metadata>,
+  pathlike: PathLike
+): Node<Data, Metadata> {
   const components = getComponentsInternal(pathlike)
 
   let i = 0
-  let current: Node<Data> = root
+  let current: Node<Data, Metadata> = root
 
   while (i < components.length) {
     let component = components[i]
@@ -56,10 +59,10 @@ function getNode<Data>(root: Node<Data>, pathlike: PathLike): Node<Data> {
   return current
 }
 
-function setNode<Data, U extends Node<Data>>(
+function setNode<Data, Metadata, U extends Node<Data, Metadata>>(
   root: U,
   pathlike: PathLike,
-  node: Node<Data>
+  node: Node<Data, Metadata>
 ): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
@@ -70,11 +73,14 @@ function setNode<Data, U extends Node<Data>>(
       throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
     }
 
-    parent.children[newName] = node as Draft<Node<Data>>
+    parent.children[newName] = node as Draft<Node<Data, Metadata>>
   })
 }
 
-function readFile<Data>(root: Node<Data>, pathlike: PathLike): Data {
+function readFile<Data, Metadata>(
+  root: Node<Data, Metadata>,
+  pathlike: PathLike
+): Data {
   const components = getComponentsInternal(pathlike)
   const node = getNode(root, components)
 
@@ -85,7 +91,10 @@ function readFile<Data>(root: Node<Data>, pathlike: PathLike): Data {
   return node.data
 }
 
-function readDirectory<Data>(root: Node<Data>, pathlike: PathLike): string[] {
+function readDirectory<Data, Metadata>(
+  root: Node<Data, Metadata>,
+  pathlike: PathLike
+): string[] {
   const components = getComponentsInternal(pathlike)
   const node = getNode(root, components)
 
@@ -108,10 +117,21 @@ function getNewAndParentName(pathlike: PathLike) {
   return { parentName, newName }
 }
 
-function makeDirectory<Data, U extends Node<Data>>(
-  root: U,
-  pathlike: PathLike
-): U {
+function makeDirectory<Data>(
+  root: Directory<Data, void>,
+  pathlike: PathLike,
+  metadata: void
+): Directory<Data, void>
+function makeDirectory<Data, Metadata>(
+  root: Directory<Data, Metadata>,
+  pathlike: PathLike,
+  metadata: Metadata
+): Directory<Data, Metadata>
+function makeDirectory<Data, Metadata>(
+  root: Directory<Data, Metadata>,
+  pathlike: PathLike,
+  metadata: Metadata
+): Directory<Data, Metadata> {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
   return produce(root, (draft) => {
@@ -128,19 +148,33 @@ function makeDirectory<Data, U extends Node<Data>>(
       return
     }
 
-    parent.children[newName] = Nodes.createDirectory()
+    parent.children[newName] = Nodes.createDirectory({}, metadata) as Draft<
+      Node<Data, Metadata>
+    >
   })
 }
 
-function writeFile<Data, U extends Node<Data>>(
+function writeFile<Data, Metadata extends void, U extends Node<Data, Metadata>>(
   root: U,
   pathlike: PathLike,
   data: Data
+): U
+function writeFile<Data, Metadata, U extends Node<Data, Metadata>>(
+  root: U,
+  pathlike: PathLike,
+  data: Data,
+  metadata: Metadata
+): U
+function writeFile<Data, Metadata, U extends Node<Data, Metadata>>(
+  root: U,
+  pathlike: PathLike,
+  data: Data,
+  metadata?: Metadata
 ): U {
-  return setNode(root, pathlike, Nodes.createFile(data))
+  return setNode(root, pathlike, Nodes.createFile(data, metadata))
 }
 
-function removeFile<Data, U extends Node<Data>>(
+function removeFile<Data, Metadata, U extends Node<Data, Metadata>>(
   root: U,
   pathlike: PathLike
 ): U {
@@ -159,6 +193,27 @@ function removeFile<Data, U extends Node<Data>>(
   })
 }
 
+function getMetadata<Data, Metadata>(
+  root: Node<Data, Metadata>,
+  pathlike: PathLike
+): Metadata {
+  const components = getComponentsInternal(pathlike)
+  const node = getNode(root, components)
+  return node.metadata
+}
+
+function setMetadata<Data, Metadata, U extends Node<Data, Metadata>>(
+  root: U,
+  pathlike: PathLike,
+  metadata: Metadata
+): U {
+  return produce(root, (draft) => {
+    const node: Draft<Node<Data, Metadata>> = getNode(draft, pathlike)
+
+    node.metadata = metadata as Draft<Metadata>
+  })
+}
+
 export const Volume = {
   getPathComponents,
   getNode,
@@ -168,4 +223,6 @@ export const Volume = {
   makeDirectory,
   writeFile,
   removeFile,
+  getMetadata,
+  setMetadata,
 }

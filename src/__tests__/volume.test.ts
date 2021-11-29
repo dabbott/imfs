@@ -1,11 +1,11 @@
 import { withOptions } from 'tree-visit'
 import { Entries, Entry, Node, Nodes, path, Volume } from '..'
 
-const { diagram: nodeDiagram } = withOptions<Entry<string>>({
+const { diagram: nodeDiagram } = withOptions<Entry<string, void>>({
   getChildren: Entries.getEntries,
 })
 
-function diagram(root: Node<string>) {
+function diagram(root: Node<string, void>) {
   return nodeDiagram(
     Entries.createEntry('/', root),
     ([pathname, node]) =>
@@ -78,4 +78,18 @@ it('removing', () => {
   expect(diagram(withAC)).toMatchSnapshot()
   expect(diagram(Volume.removeFile(withAC, '/a/c'))).toMatchSnapshot()
   expect(diagram(Volume.removeFile(withAC, '/a'))).toMatchSnapshot()
+})
+
+it('metadata', () => {
+  const root = Nodes.createDirectory<string, number>({}, 0)
+  const withA = Volume.makeDirectory(root, '/a', 1)
+  const withAC = Volume.writeFile(withA, '/a/c', 'hello', 2)
+  const withAMetadata = Volume.setMetadata(withA, '/a', 3)
+  const withACMetadata = Volume.setMetadata(withAC, '/a/c', 4)
+
+  expect(Volume.getMetadata(root, '/')).toEqual(0)
+  expect(Volume.getMetadata(withAMetadata, '/a')).toEqual(3)
+  expect(Volume.getMetadata(withACMetadata, '/a/c')).toEqual(4)
+  expect(Volume.getMetadata(withA, '/a')).toEqual(1)
+  expect(Volume.getMetadata(withAC, '/a/c')).toEqual(2)
 })

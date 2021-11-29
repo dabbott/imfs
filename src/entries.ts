@@ -2,7 +2,9 @@ import { Nodes } from './node'
 import { join } from './path'
 import { Entry, Node } from './types'
 
-function getEntries<Data>(entry: Entry<Data>): Entry<Data>[] {
+function getEntries<Data, Metadata>(
+  entry: Entry<Data, Metadata>
+): Entry<Data, Metadata>[] {
   const [pathname, node] = entry
 
   return Nodes.isDirectory(node)
@@ -13,7 +15,10 @@ function getEntries<Data>(entry: Entry<Data>): Entry<Data>[] {
     : []
 }
 
-function createEntry<Data>(pathname: string, node: Node<Data>): Entry<Data> {
+function createEntry<Data, Metadata>(
+  pathname: string,
+  node: Node<Data, Metadata>
+): Entry<Data, Metadata> {
   return [pathname, node]
 }
 

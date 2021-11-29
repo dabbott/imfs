@@ -1,7 +1,7 @@
 import { withOptions } from 'tree-visit'
 import { Directory, Entries, Entry, Nodes } from '..'
 
-const { diagram } = withOptions<Entry<Uint8Array>>({
+const { diagram } = withOptions<Entry<Uint8Array, void>>({
   getChildren: Entries.getEntries,
 })
 
@@ -27,7 +27,7 @@ it('read directory', () => {
   expect(Nodes.readDirectory(directory)).toEqual(['a', 'nested'])
   expect(
     Nodes.readDirectory(
-      Nodes.getChild(directory, 'nested') as Directory<Uint8Array>
+      Nodes.getChild(directory, 'nested') as Directory<Uint8Array, void>
     )
   ).toEqual(['b'])
 

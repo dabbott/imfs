@@ -1,38 +1,64 @@
 import { Directory, File, Node } from './types'
 
-function createFile<Data>(data: Data): File<Data> {
-  return { type: 'file', data }
+function createFile<Data>(data: Data): File<Data, void>
+function createFile<Data, Metadata>(
+  data: Data,
+  metadata: Metadata
+): File<Data, Metadata>
+function createFile<Data, Metadata>(
+  data: Data,
+  metadata?: Metadata
+): File<Data, Metadata> {
+  return { type: 'file', data, metadata } as File<Data, Metadata>
 }
 
 function createDirectory<Data>(
-  children: Directory<Data>['children'] = {}
-): Directory<Data> {
-  return { type: 'directory', children }
+  children?: Directory<Data, void>['children']
+): Directory<Data, void>
+function createDirectory<Data, Metadata>(
+  children: Directory<Data, Metadata>['children'],
+  metadata: Metadata
+): Directory<Data, Metadata>
+function createDirectory<Data, Metadata>(
+  children: Directory<Data, Metadata>['children'] = {},
+  metadata?: Metadata
+): Directory<Data, Metadata> {
+  return { type: 'directory', children, metadata } as Directory<Data, Metadata>
 }
 
-function isFile<Data>(node: Node<Data>): node is File<Data> {
+function isFile<Data, Metadata>(
+  node: Node<Data, Metadata>
+): node is File<Data, Metadata> {
   return node.type === 'file'
 }
 
-function isDirectory<Data>(node: Node<Data>): node is Directory<Data> {
+function isDirectory<Data, Metadata>(
+  node: Node<Data, Metadata>
+): node is Directory<Data, Metadata> {
   return node.type === 'directory'
 }
 
-function readDirectory<Data>(directory: Directory<Data>) {
+function getMetadata<Data, Metadata>(node: Node<Data, Metadata>): Metadata {
+  return node.metadata
+}
+
+function readDirectory<Data, Metadata>(directory: Directory<Data, Metadata>) {
   return Object.keys(directory.children)
 }
 
-function getChild<Data>(
-  directory: Directory<Data>,
+function getChild<Data, Metadata>(
+  directory: Directory<Data, Metadata>,
   name: string
-): Node<Data> | undefined {
+): Node<Data, Metadata> | undefined {
   return directory.children[name]
 }
 
-function hasChild<Data, Key extends string>(
-  directory: Directory<Data>,
+function hasChild<Data, Metadata, Key extends string>(
+  directory: Directory<Data, Metadata>,
   name: Key
-): directory is Directory<Data> & { value: { [key in Key]: Node<Data> } } {
+): directory is Directory<Data, Metadata> & {
+  value: { [key in Key]: Node<Data, Metadata> }
+} {
   return name in directory.children
 }
 
@@ -41,6 +67,7 @@ export const Nodes = {
   createDirectory,
   isFile,
   isDirectory,
+  getMetadata,
   readDirectory,
   getChild,
   hasChild,
