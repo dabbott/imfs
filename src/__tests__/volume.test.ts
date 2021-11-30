@@ -64,10 +64,10 @@ it('writing', () => {
   const withAB = Volume.makeDirectory(withA, '/b')
   const withAC = Volume.writeFile(withA, '/c', 'hello')
   const withABCDE = Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
-    makeDirectory: () => Nodes.createDirectory(),
+    makeIntermediateDirectories: true,
   })
   const withABCDEDirectory = Volume.makeDirectory(root, '/a/b/c/d/e', {
-    makeDirectory: () => Nodes.createDirectory(),
+    makeIntermediateDirectories: true,
   })
 
   expect(() => Volume.writeFile(root, '/a/b/c/d/e', 'hello')).toThrowError(
@@ -103,9 +103,20 @@ it('metadata', () => {
   const withAMetadata = Volume.setMetadata(withA, '/a', 3)
   const withACMetadata = Volume.setMetadata(withAC, '/a/c', 4)
 
+  const paths: string[] = []
+  const withABCDEMetadata = Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
+    metadata: 5,
+    makeIntermediateDirectoryMetadata: (path) => {
+      paths.push(path)
+      return 0
+    },
+  })
+
   expect(Volume.getMetadata(root, '/')).toEqual(0)
   expect(Volume.getMetadata(withAMetadata, '/a')).toEqual(3)
   expect(Volume.getMetadata(withACMetadata, '/a/c')).toEqual(4)
   expect(Volume.getMetadata(withA, '/a')).toEqual(1)
   expect(Volume.getMetadata(withAC, '/a/c')).toEqual(2)
+  expect(Volume.getMetadata(withABCDEMetadata, '/a/b/c/d/e')).toEqual(5)
+  expect(paths).toEqual(['a', 'a/b', 'a/b/c', 'a/b/c/d'])
 })

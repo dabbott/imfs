@@ -5,9 +5,13 @@ import { Directory, Node } from './types'
 
 type PathLike = string | string[]
 
-type MakeDirectoryOptions<Data, Metadata> = {
-  makeDirectory?: (path: string) => Directory<Data, Metadata>
+type VoidMakeDirectoryOptions = { makeIntermediateDirectories: boolean }
+type TypedMakeDirectoryOptions<Metadata> = {
+  makeIntermediateDirectoryMetadata?: (path: string) => Metadata
 }
+type MakeDirectoryOptions<Metadata> = Metadata extends void
+  ? VoidMakeDirectoryOptions
+  : TypedMakeDirectoryOptions<Metadata>
 
 type SetMetadataOptions<Metadata> = Metadata extends void
   ? {}
@@ -40,7 +44,7 @@ const getComponentsInternal = (pathlike: PathLike) => {
 function getNodeInternal<Data, Metadata>(
   root: Node<Data, Metadata>,
   pathlike: PathLike,
-  options: MakeDirectoryOptions<Data, Metadata>
+  options: MakeDirectoryOptions<Metadata>
 ): Node<Data, Metadata> {
   const components = getComponentsInternal(pathlike)
 
@@ -60,8 +64,25 @@ function getNodeInternal<Data, Metadata>(
 
     if (!node) {
       // Assumes we're in a writable draft
-      if (options.makeDirectory) {
-        const child = options.makeDirectory(join(...components.slice(0, i + 1)))
+      if (
+        (options as TypedMakeDirectoryOptions<Metadata>)
+          .makeIntermediateDirectoryMetadata
+      ) {
+        const child = Nodes.createDirectory<Data, Metadata>(
+          {},
+          (options as TypedMakeDirectoryOptions<Metadata>)
+            .makeIntermediateDirectoryMetadata!(
+            join(...components.slice(0, i + 1))
+          )
+        )
+
+        current.children[component] = child
+
+        node = child
+      } else if (
+        (options as VoidMakeDirectoryOptions).makeIntermediateDirectories
+      ) {
+        const child = Nodes.createDirectory<Data>() as Directory<Data, any>
 
         current.children[component] = child
 
@@ -83,14 +104,14 @@ function getNode<Data, Metadata>(
   root: Node<Data, Metadata>,
   pathlike: PathLike
 ): Node<Data, Metadata> {
-  return getNodeInternal(root, pathlike, {})
+  return getNodeInternal(root, pathlike, {} as MakeDirectoryOptions<Metadata>)
 }
 
 function setNode<Data, Metadata, U extends Node<Data, Metadata>>(
   root: U,
   pathlike: PathLike,
   node: Node<Data, Metadata>,
-  options?: MakeDirectoryOptions<Data, Metadata>
+  options?: MakeDirectoryOptions<Metadata>
 ): U {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
@@ -98,7 +119,7 @@ function setNode<Data, Metadata, U extends Node<Data, Metadata>>(
     const parent = getNodeInternal(
       draft,
       parentName,
-      (options as MakeDirectoryOptions<Draft<Data>, Draft<Metadata>>) ?? {}
+      (options ?? {}) as MakeDirectoryOptions<Draft<Metadata>>
     )
 
     if (!Nodes.isDirectory(parent)) {
@@ -152,7 +173,7 @@ function getNewAndParentName(pathlike: PathLike) {
 function makeDirectory<Data, Metadata>(
   root: Directory<Data, Metadata>,
   pathlike: PathLike,
-  options?: SetMetadataOptions<Metadata> & MakeDirectoryOptions<Data, Metadata>
+  options?: SetMetadataOptions<Metadata> & MakeDirectoryOptions<Metadata>
 ): Directory<Data, Metadata> {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
@@ -160,7 +181,7 @@ function makeDirectory<Data, Metadata>(
     const parent = getNodeInternal(
       draft,
       parentName,
-      (options as MakeDirectoryOptions<Draft<Data>, Draft<Metadata>>) ?? {}
+      (options ?? {}) as MakeDirectoryOptions<Draft<Metadata>>
     )
 
     if (!Nodes.isDirectory(parent)) {
@@ -181,11 +202,23 @@ function makeDirectory<Data, Metadata>(
   })
 }
 
+function writeFile<Data, Metadata extends void, U extends Node<Data, Metadata>>(
+  root: U,
+  pathlike: PathLike,
+  data: Data,
+  options?: VoidMakeDirectoryOptions
+): U
 function writeFile<Data, Metadata, U extends Node<Data, Metadata>>(
   root: U,
   pathlike: PathLike,
   data: Data,
-  options?: SetMetadataOptions<Metadata> & MakeDirectoryOptions<Data, Metadata>
+  options?: SetMetadataOptions<Metadata> & TypedMakeDirectoryOptions<Metadata>
+): U
+function writeFile<Data, Metadata, U extends Node<Data, Metadata>>(
+  root: U,
+  pathlike: PathLike,
+  data: Data,
+  options?: SetMetadataOptions<Metadata> & MakeDirectoryOptions<Metadata>
 ): U {
   return setNode(
     root,
