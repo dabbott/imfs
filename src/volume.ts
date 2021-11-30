@@ -282,15 +282,15 @@ function create<Data, Metadata>(
 }
 
 export const Volume = {
-  getPathComponents,
-  getNode,
-  setNode,
-  readFile,
-  readDirectory,
-  makeDirectory,
-  writeFile,
-  removeFile,
-  getMetadata,
-  setMetadata,
   create,
+  getMetadata,
+  getNode,
+  getPathComponents,
+  makeDirectory,
+  readDirectory,
+  readFile,
+  removeFile,
+  setMetadata,
+  setNode,
+  writeFile,
 }

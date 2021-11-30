@@ -63,12 +63,12 @@ function hasChild<Data, Metadata, Key extends string>(
 }
 
 export const Nodes = {
-  createFile,
   createDirectory,
-  isFile,
-  isDirectory,
-  getMetadata,
-  readDirectory,
+  createFile,
   getChild,
+  getMetadata,
   hasChild,
+  isDirectory,
+  isFile,
+  readDirectory,
 }
