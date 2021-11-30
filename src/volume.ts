@@ -268,6 +268,19 @@ function setMetadata<Data, Metadata, U extends Node<Data, Metadata>>(
   })
 }
 
+function create<Data>(): Directory<Data, void>
+function create<Data, Metadata>(
+  options: SetMetadataOptions<Metadata>
+): Directory<Data, Metadata>
+function create<Data, Metadata>(
+  options?: SetMetadataOptions<Metadata>
+): Directory<Data, Metadata> {
+  return Nodes.createDirectory(
+    {},
+    options && 'metadata' in options ? options.metadata : undefined
+  ) as Directory<Data, Metadata>
+}
+
 export const Volume = {
   getPathComponents,
   getNode,
@@ -279,4 +292,5 @@ export const Volume = {
   removeFile,
   getMetadata,
   setMetadata,
+  create,
 }

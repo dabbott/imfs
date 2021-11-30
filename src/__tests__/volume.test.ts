@@ -59,7 +59,7 @@ it('reading', () => {
 })
 
 it('writing', () => {
-  const root = Nodes.createDirectory<string>()
+  const root = Volume.create<string>()
   const withA = Volume.makeDirectory(root, '/a')
   const withAB = Volume.makeDirectory(withA, '/b')
   const withAC = Volume.writeFile(withA, '/c', 'hello')
@@ -83,7 +83,7 @@ it('writing', () => {
 })
 
 it('removing', () => {
-  const root = Nodes.createDirectory<string>()
+  const root = Volume.create<string>()
   const withA = Volume.makeDirectory(root, '/a')
   const withAC = Volume.writeFile(withA, '/a/c', 'hello')
 
@@ -93,7 +93,9 @@ it('removing', () => {
 })
 
 it('metadata', () => {
-  const root = Nodes.createDirectory<string, number>({}, 0)
+  const root = Volume.create<string, number>({
+    metadata: 0,
+  })
   const withA = Volume.makeDirectory(root, '/a', {
     metadata: 1,
   })
