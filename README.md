@@ -42,7 +42,7 @@ const data = Volume.readFile(updated, '/a/b/c/d/e.txt')
 console.log(data) // $> Hello, world!
 ```
 
-For a more realistic filesystem, use type like `Buffer` as the `Data` type (to support binary data), and a type like node's `fs.Stats` as the `Metadata` type (for permissions, timestamps, etc).
+For a more realistic filesystem, use a type like `Buffer` as the `Data` type (to support binary data), and a type like node's `fs.Stats` as the `Metadata` type (for permissions, timestamps, etc).
 
 ### Volume
 
