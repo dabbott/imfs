@@ -1,6 +1,6 @@
 # imfs
 
-A immutable filesystem-like data structure that supports updates via structural sharing. Use this when you want to store the entire history of a filesystem in a low-memory way.
+An immutable filesystem-like data structure that supports updates via structural sharing. Use this when you want to store the entire history of a filesystem in a low-memory way.
 
 ```bash
 npm install --save imfs
