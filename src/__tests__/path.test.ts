@@ -18,6 +18,7 @@ test('basename', () => {
   expect(path.basename('/bar')).toEqual(nodePath.basename('/bar'))
   expect(path.basename('./bar')).toEqual(nodePath.basename('./bar'))
   expect(path.basename('bar/')).toEqual(nodePath.basename('bar/'))
+  expect(path.basename('/bar/')).toEqual(nodePath.basename('/bar/'))
 })
 
 test('normalize', () => {
@@ -40,6 +41,7 @@ test('dirname', () => {
   expect(path.dirname('')).toEqual(nodePath.dirname(''))
   expect(path.dirname('/')).toEqual(nodePath.dirname('/'))
   expect(path.dirname('bar/')).toEqual(nodePath.dirname('bar/'))
+  expect(path.dirname('/bar/')).toEqual(nodePath.dirname('/bar/'))
 })
 
 test('join', () => {

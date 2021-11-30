@@ -82,6 +82,16 @@ it('writing', () => {
   expect(diagram(withABCDEDirectory)).toMatchSnapshot()
 })
 
+it('trailing slashes', () => {
+  const root = Volume.create<string>()
+  const withATrailing = Volume.makeDirectory(root, '/a/')
+  const withADTrailing = Volume.writeFile(withATrailing, '/a/d/', 'hello')
+
+  expect(diagram(root)).toMatchSnapshot()
+  expect(diagram(withATrailing)).toMatchSnapshot()
+  expect(diagram(withADTrailing)).toMatchSnapshot()
+})
+
 it('removing', () => {
   const root = Volume.create<string>()
   const withA = Volume.makeDirectory(root, '/a')

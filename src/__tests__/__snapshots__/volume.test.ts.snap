@@ -13,6 +13,19 @@ exports[`removing 2`] = `
 
 exports[`removing 3`] = `"/ (directory)"`;
 
+exports[`trailing slashes 1`] = `"/ (directory)"`;
+
+exports[`trailing slashes 2`] = `
+"/ (directory)
+└── a (directory)"
+`;
+
+exports[`trailing slashes 3`] = `
+"/ (directory)
+└── a (directory)
+    └── d (file)"
+`;
+
 exports[`writing 1`] = `"/ (directory)"`;
 
 exports[`writing 2`] = `

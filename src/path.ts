@@ -53,16 +53,18 @@ export function extname(filename: string) {
   return index !== -1 ? filename.slice(index) : filename
 }
 
-export function basename(filename: string, extname?: string) {
+export function basename(filename: string, extname?: string): string {
   if (extname && filename.endsWith(extname)) {
     filename = filename.slice(0, -extname.length)
   }
 
-  const sepIndex = filename.lastIndexOf(sep)
+  let sepIndex = filename.lastIndexOf(sep)
 
   // If the seperator index is the last character, omit it
   if (sepIndex === filename.length - 1) {
-    return filename.slice(0, -1)
+    filename = filename.slice(0, -1)
+
+    return filename.length > 1 ? basename(filename) : filename
   }
 
   return filename.slice(sepIndex + 1)

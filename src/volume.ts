@@ -33,7 +33,7 @@ function getPathComponents(filepath: string): string[] {
 
     if (filepath === '') return []
 
-    return filepath.split(sep)
+    return filepath.split(sep).filter((component) => !!component)
   }
 }
 
