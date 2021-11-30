@@ -63,11 +63,23 @@ it('writing', () => {
   const withA = Volume.makeDirectory(root, '/a')
   const withAB = Volume.makeDirectory(withA, '/b')
   const withAC = Volume.writeFile(withA, '/c', 'hello')
+  const withABCDE = Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
+    makeDirectory: () => Nodes.createDirectory(),
+  })
+  const withABCDEDirectory = Volume.makeDirectory(root, '/a/b/c/d/e', {
+    makeDirectory: () => Nodes.createDirectory(),
+  })
+
+  expect(() => Volume.writeFile(root, '/a/b/c/d/e', 'hello')).toThrowError(
+    'File a/b/c/d not found'
+  )
 
   expect(diagram(root)).toMatchSnapshot()
   expect(diagram(withA)).toMatchSnapshot()
   expect(diagram(withAB)).toMatchSnapshot()
   expect(diagram(withAC)).toMatchSnapshot()
+  expect(diagram(withABCDE)).toMatchSnapshot()
+  expect(diagram(withABCDEDirectory)).toMatchSnapshot()
 })
 
 it('removing', () => {
@@ -82,8 +94,12 @@ it('removing', () => {
 
 it('metadata', () => {
   const root = Nodes.createDirectory<string, number>({}, 0)
-  const withA = Volume.makeDirectory(root, '/a', 1)
-  const withAC = Volume.writeFile(withA, '/a/c', 'hello', 2)
+  const withA = Volume.makeDirectory(root, '/a', {
+    metadata: 1,
+  })
+  const withAC = Volume.writeFile(withA, '/a/c', 'hello', {
+    metadata: 2,
+  })
   const withAMetadata = Volume.setMetadata(withA, '/a', 3)
   const withACMetadata = Volume.setMetadata(withAC, '/a/c', 4)
 

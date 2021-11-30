@@ -31,3 +31,21 @@ exports[`writing 4`] = `
 ├── a (directory)
 └── c (file)"
 `;
+
+exports[`writing 5`] = `
+"/ (directory)
+└── a (directory)
+    └── b (directory)
+        └── c (directory)
+            └── d (directory)
+                └── e (file)"
+`;
+
+exports[`writing 6`] = `
+"/ (directory)
+└── a (directory)
+    └── b (directory)
+        └── c (directory)
+            └── d (directory)
+                └── e (directory)"
+`;
