@@ -1,6 +1,6 @@
 {
   "name": "imfs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A filesystem-like data structure that supports structural sharing.",
   "main": "lib/index.js",
   "files": [
