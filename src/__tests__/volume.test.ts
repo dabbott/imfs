@@ -1,5 +1,6 @@
+import produce from 'immer'
 import { withOptions } from 'tree-visit'
-import { Entries, Entry, Node, Nodes, path, Volume } from '..'
+import { Directory, Entries, Entry, Node, Nodes, path, Volume } from '..'
 
 const { diagram: nodeDiagram } = withOptions<Entry<string, void>>({
   getChildren: Entries.getEntries,
@@ -131,4 +132,25 @@ it('metadata', () => {
   expect(Volume.getMetadata(withAC, '/a/c')).toEqual(2)
   expect(Volume.getMetadata(withABCDEMetadata, '/a/b/c/d/e')).toEqual(5)
   expect(paths).toEqual(['a', 'a/b', 'a/b/c', 'a/b/c/d'])
+})
+
+it('mutable', () => {
+  const start = +Date.now()
+
+  let root = Volume.create<string>()
+
+  const amount = 10000
+
+  for (let i = 0; i < amount; i++) {
+    Volume.Mutable.writeFile(root, [`${i}.txt`], 'Hello')
+    // ;(root as Directory<any, any>).children[`${i}.txt`] =
+    //   Nodes.createFile('Hello')
+  }
+
+  expect(Volume.readDirectory(root, '/').length).toEqual(amount)
+
+  const duration = +Date.now() - start
+
+  // Mutable writing should be fast, e.g. ~10-20ms. Ensure it's under 100ms.
+  expect(duration < 100).toEqual(true)
 })
