@@ -17,7 +17,11 @@ export function setNode<Data, Metadata>(
 ) {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
-  const parent = getNodeInternal(root, parentName, options ?? {})
+  const parent = getNodeInternal(
+    root,
+    parentName,
+    options ?? ({} as MakeDirectoryOptions<Metadata>)
+  )
 
   if (!Nodes.isDirectory(parent)) {
     throw new Error(`Can't create ${newName}, ${parentName} not a directory`)
@@ -47,7 +51,11 @@ export function makeDirectory<Data, Metadata>(
 ) {
   const { parentName, newName } = getNewAndParentName(pathlike)
 
-  const parent = getNodeInternal(root, parentName, options ?? {})
+  const parent = getNodeInternal(
+    root,
+    parentName,
+    options ?? ({} as MakeDirectoryOptions<Metadata>)
+  )
 
   if (!Nodes.isDirectory(parent)) {
     throw new Error(`Can't create ${newName}, ${parentName} not a directory`)

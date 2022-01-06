@@ -1,6 +1,8 @@
 # imfs
 
-An immutable filesystem-like data structure that supports updates via structural sharing. Use this when you want to store the entire history of a filesystem in a low-memory way, or when you want an in-memory filesystem that works well with React's memoization and reducers.
+An in-memory filesystem-like data structure.
+
+Combine this library with [immer](https://github.com/immerjs/immer) to support immutability via structural sharing. This is an effective way to store the entire history of a filesystem in a low-memory way, or when you want an in-memory filesystem that works well with React's memoization and reducers.
 
 ```bash
 npm install --save imfs
@@ -32,7 +34,7 @@ import { Volume } from 'imfs'
 const root = Volume.create<string>()
 
 // Write the string 'Hello, world!' into the file 'e.txt'
-const updated = Volume.writeFile(root, '/a/b/c/d/e.txt', 'Hello, world!', {
+Volume.writeFile(root, '/a/b/c/d/e.txt', 'Hello, world!', {
   makeIntermediateDirectories: true,
 })
 

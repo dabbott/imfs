@@ -1,6 +1,5 @@
-import produce from 'immer'
 import { withOptions } from 'tree-visit'
-import { Directory, Entries, Entry, Node, Nodes, path, Volume } from '..'
+import { Entries, Entry, Node, Nodes, path, Volume } from '..'
 
 const { diagram: nodeDiagram } = withOptions<Entry<string, void>>({
   getChildren: Entries.getEntries,
@@ -59,98 +58,88 @@ it('reading', () => {
   expect(Volume.readFile(root, '/nested/b')).toEqual(b.data)
 })
 
-it('writing', () => {
-  const root = Volume.create<string>()
-  const withA = Volume.makeDirectory(root, '/a')
-  const withAB = Volume.makeDirectory(withA, '/b')
-  const withAC = Volume.writeFile(withA, '/c', 'hello')
-  const withABCDE = Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
-    makeIntermediateDirectories: true,
-  })
-  const withABCDEDirectory = Volume.makeDirectory(root, '/a/b/c/d/e', {
-    makeIntermediateDirectories: true,
-  })
+describe('mutations', () => {
+  it('writing', () => {
+    const volume = Volume.create<string>()
 
-  expect(() => Volume.writeFile(root, '/a/b/c/d/e', 'hello')).toThrowError(
-    'File a/b/c/d not found'
-  )
+    expect(() => Volume.writeFile(volume, '/a/b/c/d/e', 'hello')).toThrowError(
+      'File a/b/c/d not found'
+    )
 
-  expect(diagram(root)).toMatchSnapshot()
-  expect(diagram(withA)).toMatchSnapshot()
-  expect(diagram(withAB)).toMatchSnapshot()
-  expect(diagram(withAC)).toMatchSnapshot()
-  expect(diagram(withABCDE)).toMatchSnapshot()
-  expect(diagram(withABCDEDirectory)).toMatchSnapshot()
-})
+    expect(() => Volume.makeDirectory(volume, '/a/b/c/d/e')).toThrowError(
+      'File a/b/c/d not found'
+    )
 
-it('trailing slashes', () => {
-  const root = Volume.create<string>()
-  const withATrailing = Volume.makeDirectory(root, '/a/')
-  const withADTrailing = Volume.writeFile(withATrailing, '/a/d/', 'hello')
+    Volume.makeDirectory(volume, '/a')
+    Volume.makeDirectory(volume, '/b')
+    Volume.writeFile(volume, '/c', 'hello')
+    Volume.writeFile(volume, '/a/b/c/d/e', 'hello', {
+      makeIntermediateDirectories: true,
+    })
+    Volume.makeDirectory(volume, '/f/g/h/i/j', {
+      makeIntermediateDirectories: true,
+    })
 
-  expect(diagram(root)).toMatchSnapshot()
-  expect(diagram(withATrailing)).toMatchSnapshot()
-  expect(diagram(withADTrailing)).toMatchSnapshot()
-})
-
-it('removing', () => {
-  const root = Volume.create<string>()
-  const withA = Volume.makeDirectory(root, '/a')
-  const withAC = Volume.writeFile(withA, '/a/c', 'hello')
-
-  expect(diagram(withAC)).toMatchSnapshot()
-  expect(diagram(Volume.removeFile(withAC, '/a/c'))).toMatchSnapshot()
-  expect(diagram(Volume.removeFile(withAC, '/a'))).toMatchSnapshot()
-})
-
-it('metadata', () => {
-  const root = Volume.create<string, number>({
-    metadata: 0,
-  })
-  const withA = Volume.makeDirectory(root, '/a', {
-    metadata: 1,
-  })
-  const withAC = Volume.writeFile(withA, '/a/c', 'hello', {
-    metadata: 2,
-  })
-  const withAMetadata = Volume.setMetadata(withA, '/a', 3)
-  const withACMetadata = Volume.setMetadata(withAC, '/a/c', 4)
-
-  const paths: string[] = []
-  const withABCDEMetadata = Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
-    metadata: 5,
-    makeIntermediateDirectoryMetadata: (path) => {
-      paths.push(path)
-      return 0
-    },
+    expect(diagram(volume)).toMatchSnapshot()
   })
 
-  expect(Volume.getMetadata(root, '/')).toEqual(0)
-  expect(Volume.getMetadata(withAMetadata, '/a')).toEqual(3)
-  expect(Volume.getMetadata(withACMetadata, '/a/c')).toEqual(4)
-  expect(Volume.getMetadata(withA, '/a')).toEqual(1)
-  expect(Volume.getMetadata(withAC, '/a/c')).toEqual(2)
-  expect(Volume.getMetadata(withABCDEMetadata, '/a/b/c/d/e')).toEqual(5)
-  expect(paths).toEqual(['a', 'a/b', 'a/b/c', 'a/b/c/d'])
-})
+  it('trailing slashes', () => {
+    const root = Volume.create<string>()
+    Volume.makeDirectory(root, '/a/')
+    Volume.writeFile(root, '/a/d/', 'hello')
 
-it('mutable', () => {
-  const start = +Date.now()
+    expect(diagram(root)).toMatchSnapshot()
+  })
 
-  let root = Volume.create<string>()
+  it('removing', () => {
+    const root = Volume.create<string>()
+    Volume.writeFile(root, '/a/c', 'hello', {
+      makeIntermediateDirectories: true,
+    })
 
-  const amount = 10000
+    expect(diagram(root)).toMatchSnapshot()
 
-  for (let i = 0; i < amount; i++) {
-    Volume.Mutable.writeFile(root, [`${i}.txt`], 'Hello')
-    // ;(root as Directory<any, any>).children[`${i}.txt`] =
-    //   Nodes.createFile('Hello')
-  }
+    Volume.removeFile(root, '/a/c')
 
-  expect(Volume.readDirectory(root, '/').length).toEqual(amount)
+    expect(diagram(root)).toMatchSnapshot()
 
-  const duration = +Date.now() - start
+    Volume.removeFile(root, '/a')
 
-  // Mutable writing should be fast, e.g. ~10-20ms. Ensure it's under 100ms.
-  expect(duration < 100).toEqual(true)
+    expect(diagram(root)).toMatchSnapshot()
+  })
+
+  it('metadata', () => {
+    const root = Volume.create<string, number>({ metadata: 0 })
+
+    expect(Volume.getMetadata(root, '/')).toEqual(0)
+
+    Volume.makeDirectory(root, '/a', { metadata: 1 })
+
+    expect(Volume.getMetadata(root, '/a')).toEqual(1)
+
+    Volume.writeFile(root, '/a/c', 'hello', { metadata: 2 })
+
+    expect(Volume.getMetadata(root, '/a/c')).toEqual(2)
+
+    Volume.setMetadata(root, '/a', 3)
+
+    expect(Volume.getMetadata(root, '/a')).toEqual(3)
+
+    Volume.setMetadata(root, '/a/c', 4)
+
+    expect(Volume.getMetadata(root, '/a/c')).toEqual(4)
+
+    const paths: string[] = []
+
+    Volume.writeFile(root, '/a/b/c/d/e', 'hello', {
+      metadata: 5,
+      makeIntermediateDirectoryMetadata: (path) => {
+        paths.push(path)
+        return 0
+      },
+    })
+
+    expect(Volume.getMetadata(root, '/a/b/c/d/e')).toEqual(5)
+    expect(paths).toEqual(['a/b', 'a/b/c', 'a/b/c/d'])
+  })
 })
