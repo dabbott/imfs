@@ -63,14 +63,15 @@ describe('mutations', () => {
     const volume = Volume.create<string>()
 
     expect(() => Volume.writeFile(volume, '/a/b/c/d/e', 'hello')).toThrowError(
-      'File a/b/c/d not found'
-    )
-
-    expect(() => Volume.makeDirectory(volume, '/a/b/c/d/e')).toThrowError(
-      'File a/b/c/d not found'
+      'File a'
     )
 
     Volume.makeDirectory(volume, '/a')
+
+    expect(() => Volume.makeDirectory(volume, '/a/b/c/d/e')).toThrowError(
+      'File a/b not found'
+    )
+
     Volume.makeDirectory(volume, '/b')
     Volume.writeFile(volume, '/c', 'hello')
     Volume.writeFile(volume, '/a/b/c/d/e', 'hello', {

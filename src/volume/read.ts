@@ -60,7 +60,7 @@ export function getNodeInternal<Data, Metadata>(
 
         node = child
       } else {
-        throw new Error(`File ${join(...components)} not found`)
+        throw new Error(`File ${join(...components.slice(0, i + 1))} not found`)
       }
     }
 
