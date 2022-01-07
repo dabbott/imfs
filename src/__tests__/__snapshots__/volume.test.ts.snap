@@ -1,64 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`removing 1`] = `
+exports[`mutations removing 1`] = `
 "/ (directory)
 └── a (directory)
     └── c (file)"
 `;
 
-exports[`removing 2`] = `
+exports[`mutations removing 2`] = `
 "/ (directory)
 └── a (directory)"
 `;
 
-exports[`removing 3`] = `"/ (directory)"`;
+exports[`mutations removing 3`] = `"/ (directory)"`;
 
-exports[`trailing slashes 1`] = `"/ (directory)"`;
-
-exports[`trailing slashes 2`] = `
-"/ (directory)
-└── a (directory)"
-`;
-
-exports[`trailing slashes 3`] = `
+exports[`mutations trailing slashes 1`] = `
 "/ (directory)
 └── a (directory)
     └── d (file)"
 `;
 
-exports[`writing 1`] = `"/ (directory)"`;
-
-exports[`writing 2`] = `
-"/ (directory)
-└── a (directory)"
-`;
-
-exports[`writing 3`] = `
+exports[`mutations writing 1`] = `
 "/ (directory)
 ├── a (directory)
-└── b (directory)"
-`;
-
-exports[`writing 4`] = `
-"/ (directory)
-├── a (directory)
-└── c (file)"
-`;
-
-exports[`writing 5`] = `
-"/ (directory)
-└── a (directory)
-    └── b (directory)
-        └── c (directory)
-            └── d (directory)
-                └── e (file)"
-`;
-
-exports[`writing 6`] = `
-"/ (directory)
-└── a (directory)
-    └── b (directory)
-        └── c (directory)
-            └── d (directory)
-                └── e (directory)"
+│   └── b (directory)
+│       └── c (directory)
+│           └── d (directory)
+│               └── e (file)
+├── b (directory)
+├── c (file)
+└── f (directory)
+    └── g (directory)
+        └── h (directory)
+            └── i (directory)
+                └── j (directory)"
 `;
